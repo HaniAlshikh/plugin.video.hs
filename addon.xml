@@ -9,7 +9,7 @@
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">H-S Videos - Arabic videos at your finger tips</summary>
-		<description lang="en">Watch from a huge selection of Arabic Videos reliably and add-free...
+		<description lang="en">Watch from a huge selection of Arabic Videos reliably and ad-free...
 			Please Note: This addon requires the use of a compatible cloud service.
 		</description>
 		<platform>all</platform>
