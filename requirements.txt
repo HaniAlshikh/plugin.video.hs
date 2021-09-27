@@ -1,0 +1,4 @@
+requests==2.22.0
+kodistubs==19.0.1
+BeautifulSoup4==4.9.3
+web-pdb==1.5.6

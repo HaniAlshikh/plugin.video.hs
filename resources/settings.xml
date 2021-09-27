@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="Egy.Best">
+		<setting type="lsep" label="" />
+		<setting type="sep" />
+		<setting type="lsep" label="[COLOR yellow]يرجى كتابة اسم الدخول وكلمة السر للموقع  http://egy.best[/COLOR]" />
+		<setting type="sep" />
+		<setting type="lsep" label="" />
+		<setting id="egybest.user" type="text" label=": اسم الدخول" default="" enable="true" />
+		<setting type="lsep" label="" />
+		<setting id="egybest.pass" type="text" label=": كلمة السر" default="" option="hidden" />
+		<setting type="lsep" label="" />
+		<setting type="sep" />
+	</category>
+
+	<category label="Real Debrid">
+		<setting type="lsep" label="" />
+		<setting type="sep" />
+		<setting type="lsep" label="يرجى ادخال كود الـAPIToken" />
+		<setting type="sep" />
+		<setting type="lsep" label="" />
+		<setting id="rd.token" type="text" label="APIToken :" default="" option="hidden" />
+		<setting type="lsep" label="" />
+		<setting type="sep" />
+	</category>
+
+</settings>
