@@ -1,0 +1,31 @@
+name: Sync new version to repo
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: hanialshikh/kodi
+          token: ${{ secrets.BOT_DEPLOY_KEY }}
+
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
+
+      - name: g
+
+      - name: Commit
+        run: |
+          git config user.email "deploy-bot@no-replay.github.com"
+          git config user.name "Deploy Bot"
+          git add --all
+          git commit -m "Update H-S videos to ${${GITHUB_REF##*/}:1}" || echo "No changes to commit"
+          git push
