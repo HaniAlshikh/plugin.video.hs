@@ -20,8 +20,6 @@ jobs:
           git submodule update --init --recursive
           git submodule update --recursive --remote
 
-      - name: g
-
       - name: Commit
         run: |
           git config user.email "deploy-bot@no-replay.github.com"
