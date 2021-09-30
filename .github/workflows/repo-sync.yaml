@@ -2,8 +2,8 @@ name: Sync new version to repo
 
 on:
   push:
-#    tags:
-#      - v*
+    tags:
+      - v*
 
 jobs:
   update:
