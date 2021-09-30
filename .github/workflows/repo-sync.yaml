@@ -28,5 +28,5 @@ jobs:
           git config user.email "deploy-bot@no-replay.github.com"
           git config user.name "Deploy Bot"
           git add --all
-          git commit -m "Update H-S videos to ${${GITHUB_REF##*/}:1}" || echo "No changes to commit"
+          git commit -m "Update H-S videos to ${GITHUB_REF##*/}" || echo "No changes to commit"
           git push
