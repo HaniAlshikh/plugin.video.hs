@@ -18,6 +18,7 @@ jobs:
       - name: Pull & update submodules recursively
         run: |
           echo ${{ secrets.BOT_DEPLOY_KEY }} > key
+          GIT_SSH_COMMAND='ssh -i key -o IdentitiesOnly=yes'
           git submodule update --init --recursive
           git submodule update --recursive --remote
 
