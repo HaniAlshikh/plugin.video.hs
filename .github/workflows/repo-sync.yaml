@@ -25,8 +25,6 @@ jobs:
 
       - name: Commit
         run: |
-#          echo ${{ secrets.BOT_DEPLOY_KEY }} > key
-#          GIT_SSH_COMMAND='ssh -i key -o IdentitiesOnly=yes'
           git config user.email "deploy-bot@no-replay.github.com"
           git config user.name "Deploy Bot"
           git add --all
