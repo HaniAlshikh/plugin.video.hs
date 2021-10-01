@@ -26,7 +26,7 @@ class PlayerHelper:
                 g.sleep(500)
 
             if player.isPlaying():
-                g.log('found working source: ' + p.media_info[0]['display_name'])
+                g.log('found working source: ' + p.media_info['sources'][0]['display_name'])
                 return
 
         if media_info['sources']:

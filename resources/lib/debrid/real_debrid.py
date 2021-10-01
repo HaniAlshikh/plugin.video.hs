@@ -330,11 +330,11 @@ class RealDebrid:
         if "error" in host_list:
             return []
         valid_hosts = []
-        for domain, status in host_list.items():
-            if status["supported"] == 1 and status["status"] == "up":
-                valid_hosts.append(domain)
         # for domain, status in host_list.items():
-        #     valid_hosts.append(domain)
+        #     if status["supported"] == 1 and status["status"] == "up":
+        #         valid_hosts.append(domain)
+        for domain, status in host_list.items():
+            valid_hosts.append(domain)
         return valid_hosts
 
     def get_hosters(self, hosters):

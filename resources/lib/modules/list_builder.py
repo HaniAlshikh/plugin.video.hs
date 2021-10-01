@@ -138,6 +138,7 @@ class ListBuilder(object):
         list_items = []
         smart_play = params.pop("smart_play", False)
         no_paging = params.pop("no_paging", False)
+        next_page = trakt_list.pop() if isinstance(trakt_list[-1], int) else None
         sort = params.pop("sort", False)
         prepend_date = params.pop("prepend_date", False)
         mixed_list = params.pop("mixed_list", False)
@@ -182,9 +183,10 @@ class ListBuilder(object):
                         g.FROM_WIDGET and g.get_bool_setting("general.widget.hide_next")
                     )
                     and not no_paging
-                    and len(list_items) >= self.page_limit
+                    # and len(list_items) >= self.page_limit
+                    and next_page
                 ):
-                    g.REQUEST_PARAMS["page"] = g.PAGE + 1
+                    g.REQUEST_PARAMS["page"] = next_page #g.PAGE + 1
                     if next_args:
                         g.REQUEST_PARAMS["action_args"] = next_args
                     elif g.REQUEST_PARAMS.get("action_args") is not None:
@@ -192,7 +194,7 @@ class ListBuilder(object):
                     params = g.REQUEST_PARAMS
                     params.update({"special_sort": "bottom"})
                     g.add_directory_item(
-                        g.get_language_string(33078, addon=False),
+                        'الصفحة التالية',#g.get_language_string(33078, addon=False),
                         menu_item={
                             "art": dict.fromkeys(
                                 ['icon', 'poster', 'thumb', 'fanart'], g.NEXT_PAGE_ICON

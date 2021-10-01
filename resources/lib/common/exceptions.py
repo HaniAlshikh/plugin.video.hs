@@ -172,7 +172,7 @@ def try_and_log(source=''):
                 return f(*args, **kwargs)
             except Exception as e:
                 if hasattr(args[0], 'name'):
-                    s = args[0], 'name'
-                gl.g.log(s + ': ' + str(e), 'error')
+                    s = args[0].name
+                gl.g.log(str(s) + ': ' + str(e), 'error')
         return applicator
     return decorate

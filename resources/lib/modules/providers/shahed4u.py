@@ -28,25 +28,30 @@ class Shahed4u(Provider):
         return self._get_navbar_element('home5/', 2)
 
     def get_movies_list(self, category: str):
-        return self._extract_posts('category/' + category, g.MEDIA_MOVIE)
+        return self._get_posts('category/' + category, g.MEDIA_MOVIE)
 
     def get_shows_categories(self):
         return self._get_navbar_element('home5/', 3)
 
     def get_shows_list(self, category: str):
-        return self._extract_posts('category/' + category, g.MEDIA_SHOW)
+        return self._get_posts('category/' + category, g.MEDIA_SHOW)
 
     @try_and_log()
     def get_shows_seasons(self, url: str):
         seasons = []
         response = self.requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
+
+        seasons_div = soup.select_one("div#seasons")
+        if not seasons_div:
+            return seasons
+
         from collections import defaultdict
-        for seasonDiv in soup.select_one("div#seasons").find_all('div', class_="content-box"):
+        for season_div in seasons_div.find_all('div', class_="content-box"):
             season = defaultdict(dict)
 
-            img_a = seasonDiv.find('a', class_="image")
-            season['info']['title'] = seasonDiv.find('h3').get_text()
+            img_a = season_div.find('a', class_="image")
+            season['info']['title'] = season_div.find('h3').get_text()
             season['info']['mediatype'] = g.MEDIA_SEASON
             season['art']['poster'] = img_a.img.get('data-image')
 
@@ -58,11 +63,11 @@ class Shahed4u(Provider):
         return seasons
 
     def get_season_episodes(self, url: str):
-        return self._extract_posts(url, g.MEDIA_EPISODE)
+        return self._get_posts(url, g.MEDIA_EPISODE)
 
     def search(self, query: str, mediatype: str):
         type = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
-        return self._extract_posts('?s={}&type={}'.format(query, type), mediatype)
+        return self._get_posts('?s={}&type={}'.format(query, type), mediatype)
 
     @try_and_log()
     def get_sources(self, url: str):
@@ -83,11 +88,13 @@ class Shahed4u(Provider):
             sources.append(source)
         return sources
 
-    @try_and_log()
-    def _extract_posts(self, page: str, mediatype: str) -> list:
+    def _get_posts(self, page: str, mediatype: str) -> list:
         posts = []
+        url_pattern = "{}/?page={}" if page.endswith('list/') else "{}/page/{}"
+        page = url_pattern.format(page, g.PAGE) if g.PAGE > 1 else page
         response = self.requests.get(page)
         soup = BeautifulSoup(response.text, 'html.parser')
+
         from collections import defaultdict
         duplicates = {}  # used mostly to filter episodes
         for postDiv in soup.find_all('div', class_="content-box"):
@@ -112,6 +119,11 @@ class Shahed4u(Provider):
             post['args'] = g.create_args(post)
             posts.append(post)
             duplicates[poster] = post
+
+        page = self._get_current_page_number(soup)
+        if page:
+            posts.append(page + 1)
+
         return posts
 
     def _improve_show_meta(self, show, url: str):
@@ -131,3 +143,17 @@ class Shahed4u(Provider):
         except Exception as e:
             g.log(self.name + ': ' + str(e), 'error')
         return elements
+
+    @staticmethod
+    def _get_current_page_number(soup):
+        pages = soup.find('ul', class_='page-numbers')
+        g.log('Current Page: searchiing')
+        if pages:
+            page = pages.select_one('li.active > a')
+            if not page:
+                page = pages.select_one('span.current')
+            if page:
+                g.log('Current Page: ' + page.get_text())
+                return int(page.get_text())
+
+        return None

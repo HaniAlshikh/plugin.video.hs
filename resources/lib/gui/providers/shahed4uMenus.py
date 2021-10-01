@@ -70,6 +70,8 @@ class Shahed4uMenus(Menus):
 
     def show_seasons(self, url: str):
         seasons_list = self.api.get_shows_seasons(url)
+        if not seasons_list:
+            return self.episodes(url + 'list/')
         self.list_builder.season_list_builder(seasons_list)
 
     def episodes(self, url: str):
