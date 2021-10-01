@@ -19,3 +19,7 @@ class ResolverHelper:
         """
 
         return Resolver().resolve_multiple_until_valid_link(item_information, pack_select, True)
+
+    @staticmethod
+    def clean_up_sources(sources: list) -> list:
+        return Resolver().cleanup_sources(sources)

@@ -44,10 +44,10 @@ class Resolver:
         :return: streamable URL or dictionary of adaptive source information
         """
         stream_link = None
-        item_information['sources'] = self.cleanup_sources(item_information['sources'])
         g.log('Remaining sources: {}'.format([s['display_name'] for s in item_information['sources']]))
 
-        for source in item_information['sources']:
+        while item_information['sources']:
+            source = item_information['sources'].pop(0)
             g.log('Attempting to resolve: ' + source['display_name'] + ': ' + source['url'])
             stream_link = self.resolve_single_source(source, item_information, pack_select, silent)
             if stream_link:

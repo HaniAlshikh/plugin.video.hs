@@ -72,6 +72,8 @@ def dispatch(params):
         if sources is None:  # empty array means we already tested all sources
             from resources.lib.gui.providersMenus import Menus
             sources = Menus().PROVIDERS[action_args["provider"]].sources(action_args["url"])
-            action_args['sources'] = sources
+            from resources.lib.modules.helpers.resolver_helper import ResolverHelper
+            action_args['sources'] = ResolverHelper().clean_up_sources(sources)
+            g.log('found sources: ' + str(action_args['sources']))
 
         PlayerHelper.ensure_all_sources_were_tried(action_args)
