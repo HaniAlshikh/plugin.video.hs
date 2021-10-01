@@ -141,11 +141,11 @@ class RealDebrid:
         g.set_setting(RD_STATUS_KEY, status)
 
     def _load_settings(self):
-        # self.client_id = g.get_setting("rd.client_id", RD_AUTH_CLIENT_ID)
-        self.token = 'X62HIBEIZGMDQW27B7N5UGD7EP3YWKGDRIIDIETZCTWZLDNZEVFA'#g.get_setting(RD_AUTH_KEY)
-        # self.refresh = g.get_setting(RD_REFRESH_KEY)
-        # self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
-        # self.client_secret = g.get_setting(RD_SECRET_KEY)
+        self.client_id = g.get_setting("rd.client_id", RD_AUTH_CLIENT_ID)
+        self.token = g.get_setting(RD_AUTH_KEY)
+        self.refresh = g.get_setting(RD_REFRESH_KEY)
+        self.expiry = g.get_float_setting(RD_EXPIRY_KEY)
+        self.client_secret = g.get_setting(RD_SECRET_KEY)
 
     @staticmethod
     def _handle_error(response):

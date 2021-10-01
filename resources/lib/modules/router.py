@@ -77,3 +77,8 @@ def dispatch(params):
             g.log('found sources: ' + str(action_args['sources']))
 
         PlayerHelper.ensure_all_sources_were_tried(action_args)
+
+    elif action == "authRealDebrid":
+        from resources.lib.debrid import real_debrid
+
+        real_debrid.RealDebrid().auth()

@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-	<category label="Egy.Best">
-		<setting type="lsep" label="" />
-		<setting type="sep" />
-		<setting type="lsep" label="[COLOR yellow]يرجى كتابة اسم الدخول وكلمة السر للموقع  http://egy.best[/COLOR]" />
-		<setting type="sep" />
-		<setting type="lsep" label="" />
-		<setting id="egybest.user" type="text" label=": اسم الدخول" default="" enable="true" />
-		<setting type="lsep" label="" />
-		<setting id="egybest.pass" type="text" label=": كلمة السر" default="" option="hidden" />
-		<setting type="lsep" label="" />
-		<setting type="sep" />
-	</category>
+    <!-- Accounts -->
+    <category label="30137">
 
-	<category label="Real Debrid">
-		<setting type="lsep" label="" />
-		<setting type="sep" />
-		<setting type="lsep" label="يرجى ادخال كود الـAPIToken" />
-		<setting type="sep" />
-		<setting type="lsep" label="" />
-		<setting id="rd.token" type="text" label="APIToken :" default="" option="hidden" />
-		<setting type="lsep" label="" />
-		<setting type="sep" />
-	</category>
+        <!-- General -->
+        <setting type="lsep" label="30086"/>
+        <setting type="sep"/>
+        <setting id="general.accountNotifications" type="bool" label="30138" default="true"/>
+
+        <!-- Real-Debrid -->
+        <setting type="lsep" label="30145"/>
+        <setting type="sep"/>
+        <setting id="realdebrid.enabled" type="bool" default="false" label="30163"/>
+        <setting id="rd.username" type="text" label="30162" default="" enable="false" visible="eq(-1,true)"/>
+        <setting id="rd.premiumstatus" type="text" subsetting="true" label="30488" enable="false" visible="eq(-2,true)"
+                 default=""/>
+        <setting id="rd.auth_start" type="action" label="30161" option="close"
+                 action="RunPlugin(plugin://plugin.video.seren/?action=authRealDebrid)" visible="eq(-3,true)"/>
+        <setting id="rd.priority" type="slider" subsetting="true" label="30164" option="int" range="1,1,10" default="10"
+                 visible="eq(-4,true)"/>
+        <setting id="rd.torrents" type="bool" subsetting="true" label="30165" default="true" visible="eq(-5,true)"/>
+        <setting id="rd.hosters" type="bool" subsetting="true" label="30166" default="true" visible="eq(-6,true)"/>
+        <setting id="rd.autodelete" type="bool" subsetting="true" label="30167" default="true" visible="eq(-7,true)"/>
+        <setting id="rd.cloudInspection" type="bool" subsetting="true" label="30208" default="true"
+                 visible="eq(-8,true)"/>
+
+    </category>
 
 </settings>
