@@ -11,8 +11,11 @@ from urllib3 import Retry
 
 from resources.lib.common import tools
 from resources.lib.common.exceptions import UnexpectedResponse
+from resources.lib.common.thread_pool import ThreadPool
+from resources.lib.modules.global_lock import GlobalLock
 
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers import provider_utils
 
 RD_AUTH_KEY = "rd.auth"
 RD_STATUS_KEY = "rd.premiumstatus"
@@ -159,42 +162,42 @@ class RealDebrid:
         if response.status_code > 400:
             self._handle_error(response)
             return False
-    #
-    # def try_refresh_token(self, force=False):
-    #     if not self.refresh:
-    #         return
-    #     if not force and self.expiry > float(time.time()):
-    #         return
-    #
-    #     try:
-    #         with GlobalLock(self.__class__.__name__, True, self.token):
-    #             url = self.oauth_url + "token"
-    #             response = self.session.post(
-    #                 url,
-    #                 data={
-    #                     "grant_type": "http://oauth.net/grant_type/device/1.0",
-    #                     "code": self.refresh,
-    #                     "client_secret": self.client_secret,
-    #                     "client_id": self.client_id,
-    #                 },
-    #             )
-    #             if not self._is_response_ok(response):
-    #                 response = response.json()
-    #                 g.notification(
-    #                     g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth"
-    #                 )
-    #                 g.log("RD Refresh error: {}".format(response["error"]))
-    #                 g.log(
-    #                     "Invalid response from Real Debrid - {}".format(response), "error"
-    #                 )
-    #                 return False
-    #             response = response.json()
-    #             self._save_settings(response)
-    #             g.log("Real Debrid Token Refreshed")
-    #             return True
-    #     except RanOnceAlready:
-    #         self._load_settings()
-    #         return
+
+    def try_refresh_token(self, force=False):
+        if not self.refresh:
+            return
+        if not force and self.expiry > float(time.time()):
+            return
+
+        try:
+            with GlobalLock(self.__class__.__name__, True, self.token):
+                url = self.oauth_url + "token"
+                response = self.session.post(
+                    url,
+                    data={
+                        "grant_type": "http://oauth.net/grant_type/device/1.0",
+                        "code": self.refresh,
+                        "client_secret": self.client_secret,
+                        "client_id": self.client_id,
+                    },
+                )
+                if not self._is_response_ok(response):
+                    response = response.json()
+                    g.notification(
+                        g.ADDON_NAME, "Failed to refresh RD token, please manually re-auth"
+                    )
+                    g.log("RD Refresh error: {}".format(response["error"]))
+                    g.log(
+                        "Invalid response from Real Debrid - {}".format(response), "error"
+                    )
+                    return False
+                response = response.json()
+                self._save_settings(response)
+                g.log("Real Debrid Token Refreshed")
+                return True
+        except RanOnceAlready:
+            self._load_settings()
+            return
 
     def _get_headers(self):
         headers = {
@@ -211,9 +214,9 @@ class RealDebrid:
             return None
 
         response = self.session.post(url, data=post_data, headers=self._get_headers(), timeout=5)
-        # if not self._is_response_ok(response) and not fail_check:
-        #     self.try_refresh_token(True)
-        #     response = self.post_url(original_url, post_data, fail_check=True)
+        if not self._is_response_ok(response) and not fail_check:
+            self.try_refresh_token(True)
+            response = self.post_url(original_url, post_data, fail_check=True)
         try:
             return response.json()
         except (ValueError, AttributeError):
@@ -252,18 +255,18 @@ class RealDebrid:
             return response.json()
         except (ValueError, AttributeError):
             return response
-    #
-    # def check_hash(self, hash_list):
-    #     if isinstance(hash_list, list):
-    #         hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
-    #         thread = ThreadPool()
-    #         for section in hash_list:
-    #             thread.put(self._check_hash_thread, sorted(section))
-    #         thread.wait_completion()
-    #         return self.cache_check_results
-    #     else:
-    #         hash_string = "/" + hash_list
-    #         return self.get_url("torrents/instantAvailability" + hash_string)
+
+    def check_hash(self, hash_list):
+        if isinstance(hash_list, list):
+            hash_list = [hash_list[x : x + 100] for x in range(0, len(hash_list), 100)]
+            thread = ThreadPool()
+            for section in hash_list:
+                thread.put(self._check_hash_thread, sorted(section))
+            thread.wait_completion()
+            return self.cache_check_results
+        else:
+            hash_string = "/" + hash_list
+            return self.get_url("torrents/instantAvailability" + hash_string)
 
     def _check_hash_thread(self, hashes):
         hash_string = "/" + "/".join(hashes)
@@ -303,26 +306,26 @@ class RealDebrid:
         url = "torrents/delete/{}".format(id)
         self.delete_url(url)
 
-    # @staticmethod
-    # def is_streamable_storage_type(storage_variant):
-    #     """
-    #     Confirms that all files within the storage variant are video files
-    #     This ensure the pack from RD is instantly streamable and does not require a download
-    #     :param storage_variant:
-    #     :return: BOOL
-    #     """
-    #     return (
-    #         False
-    #         if len(
-    #             [
-    #                 i
-    #                 for i in storage_variant.values()
-    #                 if not source_utils.is_file_ext_valid(i["filename"])
-    #             ]
-    #         )
-    #         > 0
-    #         else True
-    #     )
+    @staticmethod
+    def is_streamable_storage_type(storage_variant):
+        """
+        Confirms that all files within the storage variant are video files
+        This ensure the pack from RD is instantly streamable and does not require a download
+        :param storage_variant:
+        :return: BOOL
+        """
+        return (
+            False
+            if len(
+                [
+                    i
+                    for i in storage_variant.values()
+                    if not provider_utils.is_file_ext_valid(i["filename"])
+                ]
+            )
+            > 0
+            else True
+        )
 
     # @use_cache(1)
     def get_relevant_hosters(self):

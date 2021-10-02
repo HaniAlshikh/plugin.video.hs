@@ -82,7 +82,7 @@ class Shahed4u(Provider):
             provider = source.find('span', class_='name').get_text()
             source = {'display_name': provider + ' ' + quality,
                       'release_title': soup.find('h1').get_text(),
-                      'url': source.get('href'),
+                      'url': source.get('href').strip(),
                       'quality': quality,
                       'type': 'hoster',
                       'provider': provider,
@@ -150,7 +150,6 @@ class Shahed4u(Provider):
     @staticmethod
     def _get_current_page_number(soup):
         pages = soup.find('ul', class_='page-numbers')
-        g.log('Current Page: searchiing')
         if pages:
             page = pages.select_one('li.active > a')
             if not page:

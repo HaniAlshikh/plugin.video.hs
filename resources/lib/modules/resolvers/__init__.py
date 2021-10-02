@@ -215,12 +215,13 @@ class Resolver:
     def cleanup_sources(sources: list) -> list:
         prios = [[], []] # 0. resolvable, -1. others
         RD_hosters = RealDebrid().get_relevant_hosters()
+        g.log('RD-Hosters: ' + str(RD_hosters), 'debug')
 
         sorted(sources, key=lambda s: s['quality'])
 
         for s in sources:
             s_hoster = urlparse(s['url']).netloc
-            if s_hoster in RD_hosters:
+            if s_hoster.lower() in RD_hosters:
                 s['debrid_provider'] = 'real_debrid'
 
             if s.get('debrid_provider'):

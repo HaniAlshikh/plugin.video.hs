@@ -7,6 +7,8 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 import string
 
+from resources.lib.modules.globals import g
+
 BROWSER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537."
     "36 Edge/12.246",
@@ -664,15 +666,15 @@ def get_filter_show_pack_fn(simple_info):
     return filter_fn
 
 
-# def is_file_ext_valid(file_name):
-#     """
-#     Checks if the video file type is supported by Kodi
-#     :param file_name: name/path of file
-#     :return: True if video file is expected to be supported else False
-#     """
-#     if "." + file_name.split(".")[-1] not in g.common_video_extensions:
-#         return False
-#     return True
+def is_file_ext_valid(file_name):
+    """
+    Checks if the video file type is supported by Kodi
+    :param file_name: name/path of file
+    :return: True if video file is expected to be supported else False
+    """
+    if "." + file_name.split(".")[-1] not in g.common_video_extensions:
+        return False
+    return True
 
 
 def _full_meta_episode_regex(args):
