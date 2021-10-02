@@ -2,11 +2,13 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
+import re
 
 import xbmc
 import xbmcgui
 from xbmc import sleep
 
+from resources.lib.common.tools import fix_arabic
 from resources.lib.modules.globals import g
 from resources.lib.modules.helpers.player_helper import PlayerHelper
 
@@ -30,8 +32,12 @@ def dispatch(params):
     g.log("HS, Running Path - {}".format(g.REQUEST_PARAMS))
 
     if action is None:
-        from resources.lib.gui import homeMenu
-        homeMenu.Menus().home()
+        from resources.lib.gui.homeMenu import Menus
+        Menus().home()
+
+    elif action == "searchMenu":
+        from resources.lib.gui.homeMenu import Menus
+        Menus().search_menu()
 
     elif action == "providersHome":
         from resources.lib.gui.providersMenus import Menus
@@ -77,6 +83,12 @@ def dispatch(params):
             g.log('found sources: ' + str(action_args['sources']))
 
         PlayerHelper.ensure_all_sources_were_tried(action_args)
+
+    elif action == "moviesSearch" or action == "showsSearch":
+        mediatype = g.MEDIA_MOVIE if action == "moviesSearch" else g.MEDIA_SHOW
+        from resources.lib.gui.providersMenus import Menus
+        query = fix_arabic(action_args) if isinstance(action_args, str) else None
+        Menus().search(mediatype, query)
 
     elif action == "authRealDebrid":
         from resources.lib.debrid import real_debrid

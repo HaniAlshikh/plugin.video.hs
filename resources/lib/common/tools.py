@@ -584,3 +584,15 @@ def safe_dict_get(dictionary, *path):
             break
 
     return result
+
+def fix_arabic(string: str) -> str:
+    english = re.compile('[a-z]', re.IGNORECASE)
+    result = []
+
+    for w in string.split():
+        if not english.match(w):
+            print('1')
+            w = w[::-1]
+        result.append(w)
+
+    return ' '.join(result)

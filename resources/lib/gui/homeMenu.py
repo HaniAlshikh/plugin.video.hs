@@ -10,9 +10,9 @@ class Menus:
         g.add_directory_item('قائمة المواقع',
                              action='providersHome',
                              description='قائمة المواقع المدعومة لمشاهدة احدث الافلام والمسلسلات العربية')
-        # g.add_directory_item(g.get_language_string(30013),
-        #                      action='searchMenu',
-        #                      description=g.get_language_string(30397))
+        g.add_directory_item(g.get_language_string(30013),
+                             action='searchMenu',
+                             description=g.get_language_string(30397))
         # g.add_directory_item(g.get_language_string(30027),
         #                      action='toolsMenu',
         #                      description=g.get_language_string(30398))
@@ -20,27 +20,20 @@ class Menus:
 
     @staticmethod
     def search_menu():
-        if g.get_bool_setting('searchHistory'):
-            g.add_directory_item(g.get_language_string(30025),
-                                 action='moviesSearchHistory',
-                                 description=g.get_language_string(30401))
-            g.add_directory_item(g.get_language_string(30026),
-                                 action='showsSearchHistory',
-                                 description=g.get_language_string(30402))
-        else:
-            g.add_directory_item(g.get_language_string(30025),
-                                 action='moviesSearch',
-                                 description=g.get_language_string(30399))
-            g.add_directory_item(g.get_language_string(30026),
-                                 action='showsSearch',
-                                 description=g.get_language_string(30400))
-
-        g.add_directory_item(g.get_language_string(30354),
-                             action='movieByActor',
-                             description=g.get_language_string(30403))
-        g.add_directory_item(g.get_language_string(30355),
-                             action='showsByActor',
-                             description=g.get_language_string(30404))
+        # if g.get_bool_setting('searchHistory'):
+        #     g.add_directory_item(g.get_language_string(30025),
+        #                          action='moviesSearchHistory',
+        #                          description=g.get_language_string(30401))
+        #     g.add_directory_item(g.get_language_string(30026),
+        #                          action='showsSearchHistory',
+        #                          description=g.get_language_string(30402))
+        # else:
+        g.add_directory_item(g.get_language_string(30025),
+                             action='moviesSearch',
+                             description=g.get_language_string(30399))
+        g.add_directory_item(g.get_language_string(30026),
+                             action='showsSearch',
+                             description=g.get_language_string(30400))
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod

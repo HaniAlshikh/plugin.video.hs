@@ -83,11 +83,14 @@ class Shahed4uMenus(Menus):
         return sources
 
     def search(self, query: str, mediatype: str):
-        search_list = self.api.search(query, mediatype)
-        if mediatype == 'movie':
+        search_list = self.get_search_results(query, mediatype)
+        if mediatype == g.MEDIA_MOVIE:
             self.list_builder.movie_menu_builder(search_list)
-        elif mediatype == 'tvshow':
+        elif mediatype == g.MEDIA_SHOW:
             self.list_builder.show_list_builder(search_list)
+
+    def get_search_results(self, query: str, mediatype: str):
+        return self.api.search(query, mediatype)
 
 
     # @staticmethod

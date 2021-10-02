@@ -31,7 +31,10 @@ class Shahed4u(Provider):
         return self._get_posts('category/' + category, g.MEDIA_MOVIE)
 
     def get_shows_categories(self):
-        return self._get_navbar_element('home5/', 3)
+        missing_categories = ['مسلسلات عربي']
+        categories = self._get_navbar_element('home5/', 3)
+        categories.extend(missing_categories)
+        return categories
 
     def get_shows_list(self, category: str):
         return self._get_posts('category/' + category, g.MEDIA_SHOW)
