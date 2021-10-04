@@ -556,6 +556,14 @@ class GlobalVariables(object):
             os.path.join(self.ADDON_USERDATA_PATH, "skins.db")
         )
         # self._confirm_and_init_download_path()
+        self._init_tmp_path()
+
+    def _init_tmp_path(self):
+        self.TMP_PATH = tools.ensure_path_is_dir(
+            os.path.join(g.ADDON_USERDATA_PATH, "tmp")
+        )
+        if not xbmcvfs.exists(self.TMP_PATH):
+            xbmcvfs.mkdirs(self.TMP_PATH)
 
     def get_kodi_database_version(self):
         if self.KODI_VERSION == 17:

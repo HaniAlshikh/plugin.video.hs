@@ -585,6 +585,7 @@ def safe_dict_get(dictionary, *path):
 
     return result
 
+
 def fix_arabic(string: str) -> str:
     english = re.compile('[a-z]', re.IGNORECASE)
     result = []

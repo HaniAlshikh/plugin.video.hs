@@ -130,7 +130,7 @@ class ListBuilder(object):
     def _common_menu_builder(
         self, trakt_list, content_type, action="getSources", **params
     ):
-        if len(trakt_list) == 0:
+        if not trakt_list:
             g.log("We received no titles to build a list", "warning")
             g.cancel_directory()
             return

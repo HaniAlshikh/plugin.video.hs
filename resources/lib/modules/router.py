@@ -31,37 +31,76 @@ def dispatch(params):
 
     g.log("HS, Running Path - {}".format(g.REQUEST_PARAMS))
 
+    ######################################################
+    # HOME
+    ######################################################
+
     if action is None:
-        from resources.lib.gui.homeMenu import Menus
-        Menus().home()
+        from resources.lib.gui.homeMenu import HomeMenus
+        HomeMenus().home()
+
+    elif action == "mediaProvidersHome":
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().media_providers()
+
+    elif action == "sportsProvidersHome":
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().sports_providers()
+
+    ######################################################
+    # MENUS
+    ######################################################
+
+    elif action == "mediaProviderMenu":
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().media_provider_menu(action_args["provider"])
 
     elif action == "searchMenu":
-        from resources.lib.gui.homeMenu import Menus
-        Menus().search_menu()
+        from resources.lib.gui.homeMenu import HomeMenus
+        HomeMenus().search_menu()
 
-    elif action == "providersHome":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().providers()
-
-    elif action == "providerMenu":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().provider_menu(action_args["provider"])
+    ######################################################
+    # PROVIDERS
+    ######################################################
 
     elif action == "movies":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().PROVIDERS[action_args["provider"]].movies(category)
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].movies(category)
 
     elif action == "shows":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().PROVIDERS[action_args["provider"]].shows(category)
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].shows(category)
 
     elif action == "showSeasons":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().PROVIDERS[action_args["provider"]].show_seasons(action_args["url"])
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].show_seasons(action_args["url"])
 
     elif action == "seasonEpisodes":
-        from resources.lib.gui.providersMenus import Menus
-        Menus().PROVIDERS[action_args["provider"]].episodes(action_args["url"])
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].episodes(action_args["url"])
+
+    elif action == "games":
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].games()
+
+    ######################################################
+    # SOURCES
+    ######################################################
+
+    elif action == "getSources":
+        sources = action_args.get('sources')
+        if sources is None:  # empty array means we already tested all sources
+            from resources.lib.gui.providersMenus import ProviderMenus
+            sources = ProviderMenus().PROVIDERS[action_args["provider"]].sources(action_args["url"])
+            from resources.lib.modules.helpers.resolver_helper import ResolverHelper
+            action_args['sources'] = ResolverHelper().clean_up_sources(sources)
+            g.log('found sources: ' + str(action_args['sources']))
+
+        PlayerHelper.ensure_all_sources_were_tried(action_args)
+
+    ######################################################
+    # SEARCH
+    ######################################################
 
     elif action == "search":
         mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW}
@@ -70,25 +109,14 @@ def dispatch(params):
         )
         if mediatype == -1: return
         query = g.get_keyboard_input('البحث')
-        from resources.lib.gui.providersMenus import Menus
-        Menus().PROVIDERS[action_args["provider"]].search(query, [*mediatypes.values()][mediatype])
-
-    elif action == "getSources":
-        sources = action_args.get('sources')
-        if sources is None:  # empty array means we already tested all sources
-            from resources.lib.gui.providersMenus import Menus
-            sources = Menus().PROVIDERS[action_args["provider"]].sources(action_args["url"])
-            from resources.lib.modules.helpers.resolver_helper import ResolverHelper
-            action_args['sources'] = ResolverHelper().clean_up_sources(sources)
-            g.log('found sources: ' + str(action_args['sources']))
-
-        PlayerHelper.ensure_all_sources_were_tried(action_args)
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].search(query, [*mediatypes.values()][mediatype])
 
     elif action == "moviesSearch" or action == "showsSearch":
         mediatype = g.MEDIA_MOVIE if action == "moviesSearch" else g.MEDIA_SHOW
-        from resources.lib.gui.providersMenus import Menus
+        from resources.lib.gui.providersMenus import ProviderMenus
         query = fix_arabic(action_args) if isinstance(action_args, str) else None
-        Menus().search(mediatype, query)
+        ProviderMenus().search(mediatype, query)
 
     elif action == "authRealDebrid":
         from resources.lib.debrid import real_debrid

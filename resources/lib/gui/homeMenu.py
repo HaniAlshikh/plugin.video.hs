@@ -3,13 +3,16 @@
 from resources.lib.modules.globals import g
 
 
-class Menus:
+class HomeMenus:
 
     @staticmethod
     def home():
-        g.add_directory_item('قائمة المواقع',
-                             action='providersHome',
+        g.add_directory_item('افلام ومسلسلات',
+                             action='mediaProvidersHome',
                              description='قائمة المواقع المدعومة لمشاهدة احدث الافلام والمسلسلات العربية')
+        g.add_directory_item('رياضة',
+                             action='sportsProvidersHome',
+                             description='قائمة المواقع المدعومة لمشاهدة اخر الاحداث الرياضية')
         g.add_directory_item(g.get_language_string(30013),
                              action='searchMenu',
                              description=g.get_language_string(30397))

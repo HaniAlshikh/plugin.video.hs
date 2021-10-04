@@ -2,54 +2,70 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.gui.providers.shahed4uMenus import Shahed4uMenus
+from resources.lib.gui.providers.yallalive_menus import YallaliveMenus
 from resources.lib.modules.globals import g
 from resources.lib.modules.list_builder import ListBuilder
 
 
-class Menus:
+class ProviderMenus:
     def __init__(self):
         self.list_builder = ListBuilder()
         self.page_limit = 20 #g.get_int_setting("item.limit")
         self.page_start = (g.PAGE - 1) * self.page_limit
         self.page_end = g.PAGE * self.page_limit
-        self.PROVIDERS = {}
         self._init_providers()
 
     def _init_providers(self):
-        self.PROVIDERS = {
+        self.providers_media = {
             'shahed4u': Shahed4uMenus(),
         }
+        self.providers_sports = {
+            'yallalive': YallaliveMenus(),
+        }
+
+        self.PROVIDERS = {**self.providers_media, **self.providers_sports}
 
     ######################################################
     # MENUS
     ######################################################
 
-    def providers(self):
-        for provider in self.PROVIDERS.values():
+    def media_providers(self):
+        for provider in self.providers_media.values():
             g.add_directory_item(
                 provider.api.display_name,
-                action="providerMenu",
+                action="mediaProviderMenu",
                 action_args={"provider": provider.api.name},
                 description='قائمة افلام ومسلسلات موقع {}'.format(provider.api.display_name),
             )
         g.close_directory(g.CONTENT_FOLDER)
 
-    def provider_menu(self, provider: str):
+    def sports_providers(self):
+        for provider in self.providers_sports.values():
+            g.add_directory_item(
+                provider.api.display_name,
+                action="games",
+                action_args={"provider": provider.api.name},
+                description='المباريات المنقولة من موقع {}'.format(provider.api.display_name),
+            )
+        g.close_directory(g.CONTENT_FOLDER)
+
+    @staticmethod
+    def media_provider_menu(provider: str):
         g.add_directory_item(
             "افلام",
-            action="movies".format(provider),
+            action="movies",
             action_args={"provider": provider},
             description='قائمة الافلام',
         )
         g.add_directory_item(
             "مسلسلات",
-            action="shows".format(provider),
+            action="shows",
             action_args={"provider": provider},
             description='قائمة المسلسلات',
         )
         g.add_directory_item(
             "بحث",
-            action="search".format(provider),
+            action="search",
             action_args={"provider": provider},
             description='بحث شامل في الموقع',
         )

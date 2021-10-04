@@ -10,7 +10,9 @@ class Request:
     def __init__(self, base: str):
         self.base = base
 
-    def get(self, page: str):
+    def get(self, page: str = ''):
         page = self.base + page if self.base not in page else page
         g.log('GET: Requesting: ' + page)
-        return requests.request('GET', page)
+        r = requests.get(page)
+        r.encoding = 'utf-8'
+        return r
