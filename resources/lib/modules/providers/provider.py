@@ -27,17 +27,20 @@ class Provider:
         return []
 
     @staticmethod
-    def _generate_game_poster(first_img: str, second_img: str) -> str:
-        first_img_title = first_img.split('/')[-1].split('.')[0]
-        second_img_title = second_img.split('/')[-1].split('.')[0]
+    def _generate_game_art(
+            first_img: str, first_img_title: str, second_img: str, second_img_title: str, banner=False
+    ) -> str:
+        first_img_title = '_'.join(first_img_title.split())
+        second_img_title = '_'.join(second_img_title.split())
 
-        poster_path = g.TMP_PATH + '/' + first_img_title + '-' + second_img_title + '.png'
-        poster_path_reversed = g.TMP_PATH + '/' + second_img_title + '-' + first_img_title + '.png'
+        extension = '_banner.png' if banner else '.png'
+        poster_path = os.path.join(g.TMP_PATH, first_img_title+'vs'+second_img_title+extension)
+        poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title+'vs'+first_img_title+extension)
         if not os.path.exists(poster_path):
             if os.path.exists(poster_path_reversed):
                 return poster_path_reversed
             from resources.lib.common.image_generator import combine_vs
-            poster = combine_vs(first_img, second_img)
-            poster.save(poster_path)
+            poster = combine_vs(first_img, second_img, banner)
+            poster.save(poster_path, format='png')
 
         return poster_path

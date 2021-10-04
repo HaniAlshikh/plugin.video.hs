@@ -597,3 +597,12 @@ def fix_arabic(string: str) -> str:
         result.append(w)
 
     return ' '.join(result)
+
+
+def clean_up_string(string: str, sep: str = ' ') -> str:
+    return sep.join(string.split())
+
+
+def get_current_datetime_for_time(t: str, datetime_format, time_format='%I:%M %p'):
+    t = time.strptime(t, time_format)
+    return datetime.datetime.today().replace(hour=t.tm_hour, minute=t.tm_min).strftime(datetime_format)
