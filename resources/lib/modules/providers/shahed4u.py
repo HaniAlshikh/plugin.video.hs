@@ -104,7 +104,7 @@ class Shahed4u(Provider):
             poster_img_tag = postDiv.find('a', class_="image").find('img')
             poster = poster_img_tag.get(
                 next((k for k in ['data-src', 'data-image', 'src'] if poster_img_tag.get(k)), False))
-            if mediatype == g.MEDIA_SHOW and poster in duplicates:
+            if mediatype == g.MEDIA_SHOW and duplicates.get(poster):
                 continue
 
             post = defaultdict(dict)

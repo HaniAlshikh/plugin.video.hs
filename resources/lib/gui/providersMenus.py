@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.gui.providers.asgoal_menus import AsgoalMenus
+from resources.lib.gui.providers.cimanow_menus import CimanowMenus
 from resources.lib.gui.providers.shahed4uMenus import Shahed4uMenus
 from resources.lib.gui.providers.yallalive_menus import YallaliveMenus
 from resources.lib.modules.globals import g
@@ -19,6 +20,7 @@ class ProviderMenus:
     def _init_providers(self):
         self.providers_media = {
             'shahed4u': Shahed4uMenus(),
+            'cimanow': CimanowMenus(),
         }
         self.providers_sports = {
             'asgoal': AsgoalMenus(),
@@ -87,7 +89,7 @@ class ProviderMenus:
 
     def search_results(self, mediatype, query):
         results = []
-        for p in self.PROVIDERS.values():
+        for p in self.providers_media.values():
             provider_results = p.get_search_results(query, mediatype)
             for r in provider_results:
                 r['info']['title'] = p.api.name.upper() + ': ' + r['info']['title']
