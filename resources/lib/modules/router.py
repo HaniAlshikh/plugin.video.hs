@@ -118,6 +118,10 @@ def dispatch(params):
         query = fix_arabic(action_args) if isinstance(action_args, str) else None
         ProviderMenus().search(mediatype, query)
 
+    ######################################################
+    # SERVICes
+    ######################################################
+
     elif action == "authRealDebrid":
         from resources.lib.debrid import real_debrid
 

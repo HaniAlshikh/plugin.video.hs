@@ -16,7 +16,7 @@
         <setting id="rd.premiumstatus" type="text" subsetting="true" label="30488" enable="false" visible="eq(-2,true)"
                  default=""/>
         <setting id="rd.auth_start" type="action" label="30161" option="close"
-                 action="RunPlugin(plugin://plugin.video.seren/?action=authRealDebrid)" visible="eq(-3,true)"/>
+                 action="RunPlugin(plugin://plugin.video.hs/?action=authRealDebrid)" visible="eq(-3,true)"/>
         <setting id="rd.priority" type="slider" subsetting="true" label="30164" option="int" range="1,1,10" default="10"
                  visible="eq(-4,true)"/>
         <setting id="rd.torrents" type="bool" subsetting="true" label="30165" default="true" visible="eq(-5,true)"/>
