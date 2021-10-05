@@ -25,7 +25,7 @@ class Asgoal(Provider):
         soup = BeautifulSoup(response.text, 'html.parser')
 
         from collections import defaultdict
-        for gameDiv in soup.find('div', id="yesterday").select('a.AlbaSposrTable'):
+        for gameDiv in soup.find('div', id="Today").select('a.AlbaSposrTable'):
             game = defaultdict(dict)
 
             first_team = gameDiv.find('div', class_='AlbaTableFteam')
