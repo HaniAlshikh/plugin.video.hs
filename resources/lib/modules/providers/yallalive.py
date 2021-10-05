@@ -25,7 +25,7 @@ class Yallalive(Provider):
         soup = BeautifulSoup(response.text, 'html.parser')
 
         from collections import defaultdict
-        for gameDiv in soup.find('div', id="yestrday").div:
+        for gameDiv in soup.find('div', id="today").div:
             game = defaultdict(dict)
 
             first_team = gameDiv.find('div', class_='team-first')
