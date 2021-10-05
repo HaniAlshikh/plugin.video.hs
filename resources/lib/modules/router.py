@@ -119,7 +119,7 @@ def dispatch(params):
         ProviderMenus().search(mediatype, query)
 
     ######################################################
-    # SERVICes
+    # SERVICES
     ######################################################
 
     elif action == "authRealDebrid":
