@@ -12,6 +12,7 @@ class Request:
 
     def get(self, page: str = ''):
         page = self.base + page if self.base not in page else page
+        page = page.replace(' ', '+') if '?s' or 'search' in page else page.replace(' ', '-')
         g.log('GET: Requesting: ' + page)
         r = requests.get(page)
         r.encoding = 'utf-8'
