@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+from resources.lib.gui.providers.asgoal_menus import AsgoalMenus
 from resources.lib.gui.providers.shahed4uMenus import Shahed4uMenus
 from resources.lib.gui.providers.yallalive_menus import YallaliveMenus
 from resources.lib.modules.globals import g
@@ -20,6 +21,7 @@ class ProviderMenus:
             'shahed4u': Shahed4uMenus(),
         }
         self.providers_sports = {
+            'asgoal': AsgoalMenus(),
             'yallalive': YallaliveMenus(),
         }
 

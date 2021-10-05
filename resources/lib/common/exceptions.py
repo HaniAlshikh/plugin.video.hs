@@ -164,6 +164,8 @@ class RanOnceAlready(RuntimeError):
     pass
 
 
+from contextlib import suppress
+
 def try_and_log(source=''):
     def decorate(f):
         def applicator(*args, **kwargs):
@@ -174,5 +176,6 @@ def try_and_log(source=''):
                 if hasattr(args[0], 'name'):
                     s = args[0].name
                 gl.g.log(str(s) + ': ' + str(e), 'error')
+                pass
         return applicator
     return decorate
