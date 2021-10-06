@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+from resources.lib.gui.providers.arabseed_menus import ArabseedMenus
 from resources.lib.gui.providers.asgoal_menus import AsgoalMenus
 from resources.lib.gui.providers.cimanow_menus import CimanowMenus
 from resources.lib.gui.providers.shahed4uMenus import Shahed4uMenus
@@ -21,6 +22,7 @@ class ProviderMenus:
         self.providers_media = {
             'shahed4u': Shahed4uMenus(),
             'cimanow': CimanowMenus(),
+            'arabseed': ArabseedMenus(),
         }
         self.providers_sports = {
             'asgoal': AsgoalMenus(),
