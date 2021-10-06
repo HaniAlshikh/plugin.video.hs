@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import re
-from typing import TYPE_CHECKING
-
-from resources.lib.common.exceptions import try_and_log
-from resources.lib.common.tools import get_any
 from resources.lib.modules.globals import g
-from resources.lib.modules.metadata_handler import MetadataHandler
-from resources.lib.modules.providers.provider_utils import get_quality, get_img_src
+from resources.lib.modules.providers.provider_utils import get_img_src
 
 from bs4 import BeautifulSoup
 from resources.lib.modules.providers.provider import Provider
-
-import os
-import sys
 
 
 class Shahed4u(Provider):
@@ -34,87 +25,39 @@ class Shahed4u(Provider):
         categories.extend(missing_categories)
         return categories
 
-    @try_and_log()
     def get_shows_seasons(self, url: str):
-        seasons = []
-        response = self.requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        seasons_div = soup.select_one("div#seasons")
-        if not seasons_div:
-            return seasons
-
-        from collections import defaultdict
-        for season_div in seasons_div.find_all('div', class_="content-box"):
-            season = defaultdict(dict)
-
-            img_a = season_div.find('a', class_="image")
-            season['info']['title'] = season_div.find('h3').get_text()
-            season['info']['mediatype'] = g.MEDIA_SEASON
-            season['art']['poster'] = img_a.img.get('data-image')
-
-            season['provider'] = self.name
-            season['url'] = img_a.get('href')
-
-            season['args'] = g.create_args(season)
-            seasons.append(season)
-        return seasons
+        page = self.requests.get(url).text
+        return self._extract_posts_meta(
+            page, g.MEDIA_SEASON,
+            lambda soup: soup.select_one("div#seasons").find_all('div', class_="content-box"),
+            title=lambda season_div: season_div.find('h3').get_text(),
+            poster=lambda season_div: get_img_src(season_div.find('a', class_="image").find('img')),
+            url=lambda season_div: season_div.find('a', class_="image").get('href'),
+        )
 
     def get_season_episodes(self, url: str):
         url = url + 'list/' if 'list/' not in url else url
         return self._get_posts(url, g.MEDIA_EPISODE)
 
     def search(self, query: str, mediatype: str):
-        type = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
-        return self._get_posts('?s={}&type={}'.format(query, type), mediatype)
+        type_ = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
+        return self._get_posts('?s={}&type={}'.format(query, type_), mediatype)
 
-    @try_and_log()
     def get_sources(self, url: str):
-        sources = []
-        response = self.requests.get(url + 'download/')
-        soup = BeautifulSoup(response.text, 'html.parser')
-        for source in soup.find(class_="download-media").find_all("a"):
-            quality = get_quality(source.find('span', class_='quality').get_text())
-            provider = source.find('span', class_='name').get_text()
-            source = {'display_name': provider + ' ' + quality,
-                      'release_title': soup.find('h1').get_text(),
-                      'url': source.get('href').strip(),
-                      'quality': quality,
-                      'type': 'hoster',
-                      'provider': provider,
-                      'origin': self.name}
-            MetadataHandler.improve_source(source)
-            sources.append(source)
-        return sources
-
-    def _get_posts(self, page: str, mediatype: str) -> list:
-        url_pattern = "{}/?page={}" if page.endswith('list/') else "{}/page/{}"
-        page = url_pattern.format(page, g.PAGE) if g.PAGE > 1 else page
-        response = self.requests.get(page)
-
-        posts = self._extract_post_meta(
-            response.text, mediatype,
-            lambda soup: soup.find_all('div', class_="content-box"),
-            poster=lambda post_tag: get_img_src(post_tag.find('a', class_="image").find('img')),
-            title=lambda post_tag: post_tag.a.get('title'),
-            url=lambda post_tag: post_tag.a.get('href'),
-            provider=self.name,
-            include_page=True
+        page = self.requests.get(url + 'download/').text
+        return self._extract_sources_meta(
+            page,
+            lambda soup: soup.find(class_="download-media").find_all("a"),
+            release_title=lambda soup: soup.find('h1').get_text(),
+            quality=lambda a_tag: a_tag.find('span', class_='quality').get_text(),
+            provider=lambda a_tag: a_tag.find('span', class_='name').get_text(),
+            url=lambda a_tag: a_tag.get('href').strip(),
+            type='hoster'
         )
 
-        for post in posts:
-            if isinstance(post, dict) and post['info']['mediatype'] == g.MEDIA_SHOW:
-                self._improve_show_meta(post)
-
-        return posts
-
-    def _improve_show_meta(self, show):
-        response = self.requests.get(show['url'])
-        soup = BeautifulSoup(response.text, 'html.parser')
-        show_breadcrumb = soup.select_one("div.breadcrumb > a:nth-child(3)")
-        show['info']['title'] = show_breadcrumb.get_text()
-        show['url'] = show_breadcrumb.get('href')
-        show['args'] = g.create_args(show)
+    ###################################################
+    # HELPERS
+    ###################################################
 
     def _get_categories(self, page_url, parent_cat_num: int) -> list:
         page = self.requests.get(page_url).text
@@ -125,14 +68,38 @@ class Shahed4u(Provider):
             lambda a_tag: a_tag.get('href'),
         )
 
-    def _get_current_page_number(self, soup):
-        pages = soup.find('ul', class_='page-numbers')
-        if pages:
-            page = pages.select_one('li.active > a')
-            if not page:
-                page = pages.select_one('span.current')
-            if page:
-                g.log('Current Page: ' + page.get_text())
-                return int(page.get_text())
+    def _get_posts(self, url: str, mediatype: str) -> list:
+        url_pattern = "{}/?page={}" if url.endswith('list/') else "{}/page/{}"
+        url = url_pattern.format(url, g.PAGE) if g.PAGE > 1 else url
+        page = self.requests.get(url).text
 
-        return None
+        posts = self._extract_posts_meta(
+            page, mediatype,
+            lambda soup: soup.find_all('div', class_="content-box"),
+            title=lambda post_tag: post_tag.a.get('title'),
+            poster=lambda post_tag: get_img_src(post_tag.find('a', class_="image").find('img')),
+            url=lambda post_tag: post_tag.a.get('href'),
+            include_page=True
+        )
+
+        for post in posts:
+            if isinstance(post, dict) and post['info']['mediatype'] == g.MEDIA_SHOW:
+                self._improve_show_meta(post)
+
+        return posts
+
+    def _improve_show_meta(self, show):
+        page = self.requests.get(show['url']).text
+        soup = BeautifulSoup(page, 'html.parser')
+        show_breadcrumb = soup.select_one("div.breadcrumb > a:nth-child(3)")
+        show['info']['title'] = show_breadcrumb.get_text()
+        show['url'] = show_breadcrumb.get('href')
+        show['args'] = g.create_args(show)
+
+    def _get_current_page_number(self, soup):
+        return self._extract_current_page_number(
+            soup,
+            selectors=[
+                lambda pages_tag: pages_tag.select_one('span.current')
+            ]
+        )

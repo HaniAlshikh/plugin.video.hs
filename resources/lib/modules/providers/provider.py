@@ -7,6 +7,8 @@ import bs4
 from bs4 import BeautifulSoup
 
 from resources.lib.modules.globals import g
+from resources.lib.modules.metadata_handler import MetadataHandler
+from resources.lib.modules.providers.provider_utils import get_quality
 from resources.lib.modules.request import Request
 
 
@@ -17,29 +19,39 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
+    def get_movies_categories(self):
+        pass
+
     def get_movies_list(self, category: str):
         return self._get_posts(category, g.MEDIA_MOVIE)
+
+    def get_shows_categories(self):
+        pass
 
     def get_shows_list(self, category: str):
         return self._get_posts(category, g.MEDIA_SHOW)
 
-    def movies(self, category: str = None):
+    def get_shows_seasons(self, url: str):
         pass
 
-    def tv_shows(self, category: str = None):
+    def get_season_episodes(self, url: str):
         pass
-
-    def resolve(self, url):
-        return url
 
     def search(self, query, mediatype: str):
-        return []
+        pass
 
-    def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
+    def get_sources(self, url: str):
         pass
 
     def _get_posts(self, page: str, mediatype: str) -> list:
         pass
+
+    def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
+        return self._extract_current_page_number(soup)
+
+    ###################################################
+    # HELPERS
+    ###################################################
 
     def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
         categories = []
@@ -51,7 +63,7 @@ class Provider:
             })
         return categories
 
-    def _extract_post_meta(self, page: str, mediatype, posts_tag: callable, **params) -> list:
+    def _extract_posts_meta(self, page: str, mediatype, posts_tag: callable, **params) -> list:
         posts = []
         soup = BeautifulSoup(page, 'html.parser')
 
@@ -69,7 +81,7 @@ class Provider:
             post['art']['poster'] = poster
 
             post['url'] = params.get('url')(post_tag)
-            post['provider'] = params.get('provider')
+            post['provider'] = self.name
             post['args'] = g.create_args(post)
 
             posts.append(post)
@@ -81,6 +93,46 @@ class Provider:
                 posts.append(page + 1)
 
         return posts
+
+    def _extract_current_page_number(self, soup, **params):
+        pages_tag = params.get('pages_tag')
+        pages_tag = pages_tag(soup) if pages_tag else soup.find('ul', class_='page-numbers')
+        if not pages_tag:
+            return -1
+
+        page_num = pages_tag.select_one('li.active > a')
+        if page_num:
+            return int(page_num.get_text())
+
+        if params.get('selectors'):
+            for selector in params.get('selectors'):
+                page_num = selector(pages_tag)
+                if page_num:
+                    g.log('Current Page: ' + page_num.get_text())
+                    return int(page_num.get_text())
+        return -1
+
+    def _extract_sources_meta(self, page: str, sources_tag: callable, **params) -> list:
+        sources = []
+
+        soup = BeautifulSoup(page, 'html.parser')
+        for source_tag in sources_tag(soup):
+            quality = get_quality(params.get('quality')(source_tag))
+            provider = params.get('provider')(source_tag)
+            source = {
+              'display_name': provider + ' ' + quality,
+              'release_title': params.get('release_title')(soup),
+              'url': params.get('url')(source_tag),
+              'quality': quality,
+              'type': params.get('type'),
+              'provider': provider,
+              'origin': self.name
+            }
+
+            MetadataHandler.improve_source(source)
+            sources.append(source)
+
+        return sources
 
     @staticmethod
     def _generate_game_art(

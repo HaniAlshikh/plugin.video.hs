@@ -55,7 +55,10 @@ class MediaMenu(ProviderMenu):
         g.close_directory(g.CONTENT_FOLDER)
 
     def show_seasons(self, url: str):
-        seasons_list = self.api.get_shows_seasons(url)
+        try:
+            seasons_list = self.api.get_shows_seasons(url)
+        except Exception:
+            seasons_list = []
         if not seasons_list:
             return self.episodes(url)
         self.list_builder.season_list_builder(seasons_list)
