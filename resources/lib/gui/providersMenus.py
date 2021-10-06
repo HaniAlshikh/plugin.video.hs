@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from resources.lib.gui.providers.arabseed_menus import ArabseedMenus
-from resources.lib.gui.providers.asgoal_menus import AsgoalMenus
-from resources.lib.gui.providers.cimanow_menus import CimanowMenus
-from resources.lib.gui.providers.shahed4uMenus import Shahed4uMenus
-from resources.lib.gui.providers.yallalive_menus import YallaliveMenus
+from resources.lib.gui.providers.arabseed_menu import ArabseedMenu
+from resources.lib.gui.providers.asgoal_menu import AsgoalMenu
+from resources.lib.gui.providers.cimanow_menu import CimanowMenu
+from resources.lib.gui.providers.shahed4u_menu import Shahed4uMenu
+from resources.lib.gui.providers.yallalive_menus import YallaliveMenu
 from resources.lib.modules.globals import g
 from resources.lib.modules.list_builder import ListBuilder
 
@@ -13,20 +13,17 @@ from resources.lib.modules.list_builder import ListBuilder
 class ProviderMenus:
     def __init__(self):
         self.list_builder = ListBuilder()
-        self.page_limit = 20 #g.get_int_setting("item.limit")
-        self.page_start = (g.PAGE - 1) * self.page_limit
-        self.page_end = g.PAGE * self.page_limit
         self._init_providers()
 
     def _init_providers(self):
         self.providers_media = {
-            'shahed4u': Shahed4uMenus(),
-            'cimanow': CimanowMenus(),
-            'arabseed': ArabseedMenus(),
+            'shahed4u': Shahed4uMenu(),
+            'cimanow': CimanowMenu(),
+            'arabseed': ArabseedMenu(),
         }
         self.providers_sports = {
-            'asgoal': AsgoalMenus(),
-            'yallalive': YallaliveMenus(),
+            'asgoal': AsgoalMenu(),
+            'yallalive': YallaliveMenu(),
         }
 
         self.PROVIDERS = {**self.providers_media, **self.providers_sports}

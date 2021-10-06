@@ -26,14 +26,14 @@ class Shahed4u(Provider):
         )
 
     def get_movies_categories(self):
-        return self._get_navbar_element('home5/', 2)
+        return self._get_categories('home5/', 2)
 
     def get_movies_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_MOVIE)
+        return self._get_posts(category, g.MEDIA_MOVIE)
 
     def get_shows_categories(self):
-        missing_categories = ['مسلسلات عربي']
-        categories = self._get_navbar_element('home5/', 3)
+        missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}categorie/مسلسلات عربي'.format(self.requests.base)}]
+        categories = self._get_categories('home5/', 3)
         categories.extend(missing_categories)
         return categories
 
@@ -60,13 +60,14 @@ class Shahed4u(Provider):
             season['art']['poster'] = img_a.img.get('data-image')
 
             season['provider'] = self.name
-            season['url'] = img_a.get('href') + 'list/'
+            season['url'] = img_a.get('href')
 
             season['args'] = g.create_args(season)
             seasons.append(season)
         return seasons
 
     def get_season_episodes(self, url: str):
+        url = url + 'list/' if 'list/' not in url else url
         return self._get_posts(url, g.MEDIA_EPISODE)
 
     def search(self, query: str, mediatype: str):
@@ -121,16 +122,14 @@ class Shahed4u(Provider):
         show['url'] = show_breadcrumb.get('href')
         show['args'] = g.create_args(show)
 
-    def _get_navbar_element(self, page, number: int) -> list:
-        elements = []
-        try:
-            response = self.requests.get(page)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            for el in soup.select_one("ul#main_nav_header > li:nth-child({})".format(number)).find_all('a'):
-                elements.append(el.get_text())
-        except Exception as e:
-            g.log(self.name + ': ' + str(e), 'error')
-        return elements
+    def _get_categories(self, page, number: int) -> list:
+        response = self.requests.get(page)
+        return self._extract_categories_meta(
+            response.text,
+            lambda soup: soup.select_one("ul#main_nav_header > li:nth-child({})".format(number)).find_all('a'),
+            lambda a_tag: a_tag.get_text(),
+            lambda a_tag: a_tag.get('href'),
+        )
 
     def _get_current_page_number(self, soup):
         pages = soup.find('ul', class_='page-numbers')

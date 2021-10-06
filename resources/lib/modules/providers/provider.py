@@ -33,6 +33,15 @@ class Provider:
         pass
 
 
+    def _extract_categories_meta(self, html, categories_div,  cat_title, cat_url):
+        categories = []
+        soup = BeautifulSoup(html, 'html.parser')
+        cat = {}
+        for cat_tag in categories_div(soup):
+            cat['title'] = cat_title(cat_tag)
+            cat['url'] = cat_url(cat_tag)
+        return categories
+
     def _extract_post_meta(self, html: str, mediatype, posts_tag: callable, **params) -> list:
         posts = []
         soup = BeautifulSoup(html, 'html.parser')

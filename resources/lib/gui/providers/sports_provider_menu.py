@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from resources.lib.gui.menus import Menus
-from resources.lib.modules.list_builder import ListBuilder
-from resources.lib.modules.providers.asgoal import Asgoal
+from resources.lib.gui.providers.provider_menu import ProviderMenu
 
 
-class AsgoalMenus(Menus):
+class SportsMenu(ProviderMenu):
     def __init__(self):
         super().__init__()
-        self.api = Asgoal()
-        self.list_builder = ListBuilder()
 
     ######################################################
     # MENUS
