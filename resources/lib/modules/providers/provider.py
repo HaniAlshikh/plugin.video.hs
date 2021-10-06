@@ -3,6 +3,9 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
+import bs4
+from bs4 import BeautifulSoup
+
 from resources.lib.modules.globals import g
 from resources.lib.modules.request import Request
 
@@ -25,6 +28,41 @@ class Provider:
 
     def search(self, query, mediatype: str):
         return []
+
+    def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
+        pass
+
+
+    def _extract_post_meta(self, html: str, mediatype, posts_tag: callable, **params) -> list:
+        posts = []
+        soup = BeautifulSoup(html, 'html.parser')
+
+        from collections import defaultdict
+        duplicates = {}  # used mostly to filter episodes
+        for post_tag in posts_tag(soup):
+            poster = params.get('poster')(post_tag) if params.get('poster') else ''
+            if mediatype == g.MEDIA_SHOW and poster and duplicates.get(poster):
+                continue
+
+            post = defaultdict(dict)
+            post['info']['title'] = params.get('title')(post_tag)
+            post['info']['mediatype'] = mediatype
+
+            post['art']['poster'] = poster
+
+            post['url'] = params.get('url')(post_tag)
+            post['provider'] = params.get('provider')
+            post['args'] = g.create_args(post)
+
+            posts.append(post)
+            duplicates[poster] = post
+
+        if params.get('include_page'):
+            page = self._get_current_page_number(soup)
+            if page:
+                posts.append(page + 1)
+
+        return posts
 
     @staticmethod
     def _generate_game_art(

@@ -5,9 +5,10 @@ import re
 from typing import TYPE_CHECKING
 
 from resources.lib.common.exceptions import try_and_log
+from resources.lib.common.tools import get_any
 from resources.lib.modules.globals import g
 from resources.lib.modules.metadata_handler import MetadataHandler
-from resources.lib.modules.providers.provider_utils import get_quality
+from resources.lib.modules.providers.provider_utils import get_quality, get_img_src
 
 from bs4 import BeautifulSoup
 from resources.lib.modules.providers.provider import Provider
@@ -92,49 +93,33 @@ class Shahed4u(Provider):
         return sources
 
     def _get_posts(self, page: str, mediatype: str) -> list:
-        posts = []
         url_pattern = "{}/?page={}" if page.endswith('list/') else "{}/page/{}"
         page = url_pattern.format(page, g.PAGE) if g.PAGE > 1 else page
         response = self.requests.get(page)
-        soup = BeautifulSoup(response.text, 'html.parser')
 
-        from collections import defaultdict
-        duplicates = {}  # used mostly to filter episodes
-        for postDiv in soup.find_all('div', class_="content-box"):
-            poster_img_tag = postDiv.find('a', class_="image").find('img')
-            poster = poster_img_tag.get(
-                next((k for k in ['data-src', 'data-image', 'src'] if poster_img_tag.get(k)), False))
-            if mediatype == g.MEDIA_SHOW and duplicates.get(poster):
-                continue
+        posts = self._extract_post_meta(
+            response.text, mediatype,
+            lambda soup: soup.find_all('div', class_="content-box"),
+            poster=lambda post_tag: get_img_src(post_tag.find('a', class_="image").find('img')),
+            title=lambda post_tag: post_tag.a.get('title'),
+            url=lambda post_tag: post_tag.a.get('href'),
+            provider=self.name,
+            include_page=True
+        )
 
-            post = defaultdict(dict)
-
-            post['info']['title'] = postDiv.a.get('title')
-            post['art']['poster'] = poster
-            post['info']['mediatype'] = mediatype
-
-            post['url'] = postDiv.a.get('href')
-            post['provider'] = self.name
-
-            if mediatype == g.MEDIA_SHOW:
-                self._improve_show_meta(post, postDiv.a.get('href'))
-
-            post['args'] = g.create_args(post)
-            posts.append(post)
-            duplicates[poster] = post
-
-        page = self._get_current_page_number(soup)
-        if page:
-            posts.append(page + 1)
+        for post in posts:
+            if isinstance(post, dict) and post['info']['mediatype'] == g.MEDIA_SHOW:
+                self._improve_show_meta(post)
 
         return posts
 
-    def _improve_show_meta(self, show, url: str):
-        response = self.requests.get(url)
+    def _improve_show_meta(self, show):
+        response = self.requests.get(show['url'])
         soup = BeautifulSoup(response.text, 'html.parser')
         show_breadcrumb = soup.select_one("div.breadcrumb > a:nth-child(3)")
         show['info']['title'] = show_breadcrumb.get_text()
         show['url'] = show_breadcrumb.get('href')
+        show['args'] = g.create_args(show)
 
     def _get_navbar_element(self, page, number: int) -> list:
         elements = []
@@ -147,8 +132,7 @@ class Shahed4u(Provider):
             g.log(self.name + ': ' + str(e), 'error')
         return elements
 
-    @staticmethod
-    def _get_current_page_number(soup):
+    def _get_current_page_number(self, soup):
         pages = soup.find('ul', class_='page-numbers')
         if pages:
             page = pages.select_one('li.active > a')
