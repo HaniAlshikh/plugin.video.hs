@@ -19,13 +19,13 @@ class Cimanow(Provider):
         )
 
     def get_movies_categories(self):
-        return self._get_menu_item_categories('category/الافلام/')
+        return self._get_categories('category/الافلام/')
 
     def get_movies_list(self, category: str):
         return self._get_posts('category/' + category, g.MEDIA_MOVIE)
 
     def get_shows_categories(self):
-        return self._get_menu_item_categories('category/المسلسلات/')
+        return self._get_categories('category/المسلسلات/')
 
     def get_shows_list(self, category: str):
         return self._get_posts('category/' + category, g.MEDIA_SHOW)
@@ -151,13 +151,14 @@ class Cimanow(Provider):
 
         return posts
 
-    def _get_menu_item_categories(self, page) -> list:
-        categories = []
-        response = self.requests.get(page)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        for cat in soup.find_all('section'):
-            categories.append(cat.span.next)
-        return categories
+    def _get_categories(self, page_url) -> list:
+        page = self.requests.get(page_url).text
+        return self._extract_categories_meta(
+            page,
+            lambda soup: soup.find_all('section'),
+            lambda section: section.span.next,
+            lambda section: section.find('a').get('href'),
+        )
 
     @staticmethod
     def _get_current_page_number(soup):

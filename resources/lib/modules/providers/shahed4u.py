@@ -122,11 +122,11 @@ class Shahed4u(Provider):
         show['url'] = show_breadcrumb.get('href')
         show['args'] = g.create_args(show)
 
-    def _get_categories(self, page, number: int) -> list:
-        response = self.requests.get(page)
+    def _get_categories(self, page_url, parent_cat_num: int) -> list:
+        page = self.requests.get(page_url).text
         return self._extract_categories_meta(
-            response.text,
-            lambda soup: soup.select_one("ul#main_nav_header > li:nth-child({})".format(number)).find_all('a'),
+            page,
+            lambda soup: soup.select_one("ul#main_nav_header > li:nth-child({})".format(parent_cat_num)).find_all('a'),
             lambda a_tag: a_tag.get_text(),
             lambda a_tag: a_tag.get('href'),
         )

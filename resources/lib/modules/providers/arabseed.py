@@ -27,13 +27,13 @@ class Arabseed(Provider):
         )
 
     def get_movies_categories(self):
-        return self._get_navbar_element('main/', 2)
+        return self._get_categories('main/', 2)
 
     def get_movies_list(self, category: str):
         return self._get_posts('category/' + category, g.MEDIA_MOVIE)
 
     def get_shows_categories(self):
-        return self._get_navbar_element('main/', 4)
+        return self._get_categories('main/', 4)
 
     def get_shows_list(self, category: str):
         return self._get_posts('category/' + category, g.MEDIA_SHOW)
@@ -131,16 +131,16 @@ class Arabseed(Provider):
         show['info']['title'] = show['info']['title'].split('الحلقة')[0]
         show['info']['plot'] = '' # it's not really useful here
 
-    def _get_navbar_element(self, page, number: int) -> list:
-        elements = []
-        response = self.requests.get(page)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        for el in soup.select_one('ul#main-menu').find_all('li', recursive=False)[number].ul.find_all('a'):
-            elements.append(el.get_text())
-        return elements
+    def _get_categories(self, page_url, parent_cat_num: int) -> list:
+        page = self.requests.get(page_url).text
+        return self._extract_categories_meta(
+            page,
+            lambda soup: soup.select_one('ul#main-menu').find_all('li', recursive=False)[parent_cat_num].ul.find_all('a'),
+            lambda a_tag: a_tag.get_text(),
+            lambda a_tag: a_tag.get('href'),
+        )
 
-    @staticmethod
-    def _get_current_page_number(soup):
+    def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
         pages = soup.find('ul', class_='page-numbers')
         if pages:
             page = pages.select_one('li.active > a')
@@ -150,4 +150,4 @@ class Arabseed(Provider):
                 g.log('Current Page: ' + page.get_text())
                 return int(page.get_text())
 
-        return None
+        return -1

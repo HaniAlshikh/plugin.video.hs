@@ -32,19 +32,19 @@ class Provider:
     def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
         pass
 
-
-    def _extract_categories_meta(self, html, categories_div,  cat_title, cat_url):
+    def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
         categories = []
-        soup = BeautifulSoup(html, 'html.parser')
-        cat = {}
+        soup = BeautifulSoup(page, 'html.parser')
         for cat_tag in categories_div(soup):
-            cat['title'] = cat_title(cat_tag)
-            cat['url'] = cat_url(cat_tag)
+            categories.append({
+                'title': cat_title(cat_tag),
+                'url': cat_url(cat_tag)
+            })
         return categories
 
-    def _extract_post_meta(self, html: str, mediatype, posts_tag: callable, **params) -> list:
+    def _extract_post_meta(self, page: str, mediatype, posts_tag: callable, **params) -> list:
         posts = []
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(page, 'html.parser')
 
         from collections import defaultdict
         duplicates = {}  # used mostly to filter episodes
@@ -81,8 +81,8 @@ class Provider:
         second_img_title = '_'.join(second_img_title.split())
 
         extension = '_banner.png' if banner else '.png'
-        poster_path = os.path.join(g.TMP_PATH, first_img_title+'vs'+second_img_title+extension)
-        poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title+'vs'+first_img_title+extension)
+        poster_path = os.path.join(g.TMP_PATH, first_img_title + 'vs' + second_img_title + extension)
+        poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title + 'vs' + first_img_title + extension)
         if not os.path.exists(poster_path):
             if os.path.exists(poster_path_reversed):
                 return poster_path_reversed
