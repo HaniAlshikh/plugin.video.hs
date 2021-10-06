@@ -28,17 +28,11 @@ class Shahed4u(Provider):
     def get_movies_categories(self):
         return self._get_categories('home5/', 2)
 
-    def get_movies_list(self, category: str):
-        return self._get_posts(category, g.MEDIA_MOVIE)
-
     def get_shows_categories(self):
         missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}categorie/مسلسلات عربي'.format(self.requests.base)}]
         categories = self._get_categories('home5/', 3)
         categories.extend(missing_categories)
         return categories
-
-    def get_shows_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_SHOW)
 
     @try_and_log()
     def get_shows_seasons(self, url: str):

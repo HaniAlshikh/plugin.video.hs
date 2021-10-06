@@ -21,14 +21,8 @@ class Cimanow(Provider):
     def get_movies_categories(self):
         return self._get_categories('category/الافلام/')
 
-    def get_movies_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_MOVIE)
-
     def get_shows_categories(self):
         return self._get_categories('category/المسلسلات/')
-
-    def get_shows_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_SHOW)
 
     def get_shows_seasons(self, url: str):
         seasons = []

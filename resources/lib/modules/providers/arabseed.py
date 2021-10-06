@@ -29,14 +29,8 @@ class Arabseed(Provider):
     def get_movies_categories(self):
         return self._get_categories('main/', 2)
 
-    def get_movies_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_MOVIE)
-
     def get_shows_categories(self):
         return self._get_categories('main/', 4)
-
-    def get_shows_list(self, category: str):
-        return self._get_posts('category/' + category, g.MEDIA_SHOW)
 
     def get_shows_seasons(self, url: str):
         return []

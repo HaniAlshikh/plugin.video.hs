@@ -17,6 +17,12 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
+    def get_movies_list(self, category: str):
+        return self._get_posts(category, g.MEDIA_MOVIE)
+
+    def get_shows_list(self, category: str):
+        return self._get_posts(category, g.MEDIA_SHOW)
+
     def movies(self, category: str = None):
         pass
 
@@ -30,6 +36,9 @@ class Provider:
         return []
 
     def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
+        pass
+
+    def _get_posts(self, page: str, mediatype: str) -> list:
         pass
 
     def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
