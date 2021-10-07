@@ -604,5 +604,9 @@ def clean_up_string(string: str, sep: str = ' ') -> str:
 
 
 def get_current_datetime_for_time(t: str, datetime_format, time_format='%I:%M %p'):
-    t = time.strptime(t, time_format)
+    t = time.strptime(t.strip(), time_format)
     return datetime.datetime.today().replace(hour=t.tm_hour, minute=t.tm_min).strftime(datetime_format)
+
+
+def get_any(dic: dict, *keys):
+    return dic.get(next((k for k in keys if dic.get(k)), None))

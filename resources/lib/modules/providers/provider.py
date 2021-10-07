@@ -3,7 +3,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
+from bs4 import BeautifulSoup
+
 from resources.lib.modules.globals import g
+from resources.lib.modules.metadata_handler import MetadataHandler
+from resources.lib.modules.providers.provider_utils import get_quality
 from resources.lib.modules.request import Request
 
 
@@ -14,17 +18,91 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
-    def movies(self, category: str = None):
-        pass
+    def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
+        categories = []
+        soup = BeautifulSoup(page, 'html.parser')
+        for cat_tag in categories_div(soup):
+            categories.append({
+                'title': cat_title(cat_tag),
+                'url': cat_url(cat_tag)
+            })
+        return categories
 
-    def tv_shows(self, category: str = None):
-        pass
+    def _extract_posts_meta(self, page: str, mediatype, posts_tag: callable, **params) -> list:
+        posts = []
+        soup = BeautifulSoup(page, 'html.parser')
 
-    def resolve(self, url):
-        return url
+        duplicates = {}  # used mostly to filter episodes
+        for post_tag in posts_tag(soup):
+            poster = (params.get('poster') or self._none)(post_tag)
+            if mediatype == g.MEDIA_SHOW and poster and duplicates.get(poster):
+                continue
 
-    def search(self, query, mediatype: str):
-        return []
+            post = MetadataHandler.media(
+                title=(params.get('title') or self._none)(post_tag),
+                mediatype=mediatype,
+                poster=poster,
+                url=(params.get('url') or self._none)(post_tag),
+                provider=self.name,
+
+            )
+
+            if params.get('edit_meta'):
+                params['edit_meta'](post)
+
+            posts.append(post)
+            duplicates[poster] = post
+
+        if params.get('include_page'):
+            page = self._extract_current_page_number(soup)
+            if page:
+                posts.append(page + 1)
+
+        return posts
+
+    def _extract_current_page_number(self, soup, **params):
+        pages_tag = params.get('pages_tag')
+        pages_tag = pages_tag(soup) if pages_tag else soup.find('ul', class_='page-numbers')
+        if not pages_tag:
+            return -1
+
+        page_num = pages_tag.select_one('li.active > a')
+        if page_num:
+            return int(page_num.get_text())
+
+        page_num = pages_tag.select_one('span.current')
+        if page_num:
+            return int(page_num.get_text())
+
+        if params.get('selectors'):
+            for selector in params.get('selectors'):
+                page_num = selector(pages_tag)
+                if page_num:
+                    g.log('Current Page: ' + page_num.get_text())
+                    return int(page_num.get_text())
+        return -1
+
+    def _extract_sources_meta(self, page: str, sources_tag: callable, **params) -> list:
+        sources = []
+
+        soup = BeautifulSoup(page, 'html.parser')
+        for source_tag in sources_tag(soup):
+            quality = get_quality(params.get('quality')(source_tag))
+            provider = params.get('provider')(source_tag)
+            source = {
+              'display_name': provider + ' ' + quality,
+              'release_title': params.get('release_title')(soup),
+              'url': params.get('url')(source_tag),
+              'quality': quality,
+              'type': params.get('type'),
+              'provider': provider,
+              'origin': self.name
+            }
+
+            MetadataHandler.improve_source(source)
+            sources.append(source)
+
+        return sources
 
     @staticmethod
     def _generate_game_art(
@@ -34,8 +112,8 @@ class Provider:
         second_img_title = '_'.join(second_img_title.split())
 
         extension = '_banner.png' if banner else '.png'
-        poster_path = os.path.join(g.TMP_PATH, first_img_title+'vs'+second_img_title+extension)
-        poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title+'vs'+first_img_title+extension)
+        poster_path = os.path.join(g.TMP_PATH, first_img_title + 'vs' + second_img_title + extension)
+        poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title + 'vs' + first_img_title + extension)
         if not os.path.exists(poster_path):
             if os.path.exists(poster_path_reversed):
                 return poster_path_reversed
@@ -44,3 +122,7 @@ class Provider:
             poster.save(poster_path, format='png')
 
         return poster_path
+
+    @staticmethod
+    def _none(*args):
+        return None

@@ -4,14 +4,32 @@ from __future__ import absolute_import, division, unicode_literals
 from resources.lib.common.tools import clean_up_string
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.provider_utils import get_info
-from urllib.parse import urlparse
-from resources.lib.debrid.real_debrid import RealDebrid
+
 
 class MetadataHandler:
 
     @staticmethod
+    def media(**params):
+        from collections import defaultdict
+        media = defaultdict(dict)
+
+        media['info']['title'] = params.get('title')
+        media['info']['mediatype'] = params.get('mediatype')
+
+        media['art']['poster'] = params.get('poster')
+
+        media['url'] = params.get('url')
+        media['provider'] = params.get('provider')
+        media['args'] = g.create_args(media)
+
+        return media
+
+    @staticmethod
     def improve_media(item):
         item['info']['title'] = clean_up_string(item['info']['title'])
+
+        if item.get('url'):
+            item['url'] = item['url'].strip()
 
         if item.get('art'):
             if item['art'].get('poster'):
@@ -42,3 +60,6 @@ class MetadataHandler:
             item['provider'] = item['origin']
         if 'خاص' in item['provider']:
             item['display_name'] = item['provider'] + ' ' + item['quality']
+
+        if item.get('url'):
+            item['url'] = item['url'].strip()

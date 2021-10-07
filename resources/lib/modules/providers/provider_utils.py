@@ -7,6 +7,7 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 import string
 
+from resources.lib.common.tools import get_any
 from resources.lib.modules.globals import g
 
 BROWSER_AGENTS = [
@@ -842,3 +843,6 @@ def de_string_size(size):
 #         resolutions.append("4K")
 #
 #     return resolutions
+
+def get_img_src(dic: dict) -> str:
+    return get_any(dic, 'data-src', 'data-image', 'src')

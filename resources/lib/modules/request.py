@@ -12,22 +12,22 @@ class Request:
     def __init__(self, base: str):
         self.base = base
 
-    def get(self, page: str = ''):
-        page = self.base + page if urlparse(self.base).netloc not in page else page
-        page = page.replace(' ', '+') if any(s in page for s in ['?s', 'search']) else page.replace(' ', '-')
-        g.log('GET: Requesting: ' + page)
-        r = requests.get(page)
+    def get(self, url: str = ''):
+        url = self.prep_url(url)
+        g.log('GET: Requesting: ' + url)
+        r = requests.get(url)
         r.encoding = 'utf-8'
         return r
 
-    def post(self, page: str = '', data: dict = {}):
-        page = self.prep_url(page)
-        g.log('POST: Requesting: ' + page)
-        r = requests.post(page, data)
+    def post(self, url: str = '', data: dict = {}):
+        url = self.prep_url(url)
+        g.log('POST: Requesting: ' + url)
+        r = requests.post(url, data)
         r.encoding = 'utf-8'
         return r
 
-    def prep_url(self, page):
-        page = self.base + page if urlparse(self.base).netloc not in page else page
-        page = page.replace(' ', '+') if any(s in page for s in ['?s', 'search']) else page.replace(' ', '-')
-        return page
+    def prep_url(self, url):
+        url = self.base + url if urlparse(self.base).netloc not in url else url
+        url = url.strip()
+        url = url.replace(' ', '+') if any(s in url for s in ['?s', 'search']) else url.replace(' ', '-')
+        return url
