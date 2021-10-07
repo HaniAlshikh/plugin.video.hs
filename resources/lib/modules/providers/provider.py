@@ -19,35 +19,40 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
-    def get_movies_categories(self):
-        pass
+    def get_movies_categories(self) -> list:
+        return []
 
-    def get_movies_list(self, category: str):
-        return self._get_posts(category, g.MEDIA_MOVIE)
+    def get_movies_list(self, category: str) -> list:
+        page = self._get_paginated_page(category)
+        return self._get_posts(page, g.MEDIA_MOVIE)
 
-    def get_shows_categories(self):
-        pass
+    def get_shows_categories(self) -> list:
+        return []
 
-    def get_shows_list(self, category: str):
-        return self._get_posts(category, g.MEDIA_SHOW)
+    def get_shows_list(self, category: str) -> list:
+        page = self._get_paginated_page(category)
+        return self._get_posts(page, g.MEDIA_SHOW)
 
-    def get_shows_seasons(self, url: str):
-        pass
+    def get_shows_seasons(self, url: str) -> list:
+        return []
 
-    def get_season_episodes(self, url: str):
-        pass
+    def get_season_episodes(self, url: str) -> list:
+        return []
 
-    def search(self, query, mediatype: str):
-        pass
+    def search(self, query, mediatype: str) -> list:
+        return []
 
-    def get_sources(self, url: str):
-        pass
+    def get_sources(self, url: str) -> list:
+        return []
 
     def _get_posts(self, page: str, mediatype: str) -> list:
-        pass
+        return []
 
     def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
         return self._extract_current_page_number(soup)
+
+    def _get_paginated_page(self, url: str) -> str:
+        return url
 
     ###################################################
     # HELPERS
@@ -101,6 +106,10 @@ class Provider:
             return -1
 
         page_num = pages_tag.select_one('li.active > a')
+        if page_num:
+            return int(page_num.get_text())
+
+        page_num = pages_tag.select_one('span.current')
         if page_num:
             return int(page_num.get_text())
 

@@ -16,16 +16,16 @@ class Shahed4u(Provider):
             ["https://shahed4u.land/"],
         )
 
-    def get_movies_categories(self):
+    def get_movies_categories(self) -> list:
         return self._get_categories('home5/', 2)
 
-    def get_shows_categories(self):
+    def get_shows_categories(self) -> list:
         missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}categorie/مسلسلات عربي'.format(self.requests.base)}]
         categories = self._get_categories('home5/', 3)
         categories.extend(missing_categories)
         return categories
 
-    def get_shows_seasons(self, url: str):
+    def get_shows_seasons(self, url: str) -> list:
         page = self.requests.get(url).text
         return self._extract_posts_meta(
             page, g.MEDIA_SEASON,
@@ -35,15 +35,17 @@ class Shahed4u(Provider):
             url=lambda season_div: season_div.find('a', class_="image").get('href'),
         )
 
-    def get_season_episodes(self, url: str):
+    def get_season_episodes(self, url: str) -> list:
         url = url + 'list/' if 'list/' not in url else url
-        return self._get_posts(url, g.MEDIA_EPISODE)
+        page = self._get_paginated_page(url)
+        return self._get_posts(page, g.MEDIA_EPISODE)
 
-    def search(self, query: str, mediatype: str):
+    def search(self, query: str, mediatype: str) -> list:
         type_ = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
-        return self._get_posts('?s={}&type={}'.format(query, type_), mediatype)
+        page = self._get_paginated_page('?s={}&type={}'.format(query, type_))
+        return self._get_posts(page, mediatype)
 
-    def get_sources(self, url: str):
+    def get_sources(self, url: str) -> list:
         page = self.requests.get(url + 'download/').text
         return self._extract_sources_meta(
             page,
@@ -51,7 +53,7 @@ class Shahed4u(Provider):
             release_title=lambda soup: soup.find('h1').get_text(),
             quality=lambda a_tag: a_tag.find('span', class_='quality').get_text(),
             provider=lambda a_tag: a_tag.find('span', class_='name').get_text(),
-            url=lambda a_tag: a_tag.get('href').strip(),
+            url=lambda a_tag: a_tag.get('href'),
             type='hoster'
         )
 
@@ -68,11 +70,13 @@ class Shahed4u(Provider):
             lambda a_tag: a_tag.get('href'),
         )
 
-    def _get_posts(self, url: str, mediatype: str) -> list:
-        url_pattern = "{}/?page={}" if url.endswith('list/') else "{}/page/{}"
-        url = url_pattern.format(url, g.PAGE) if g.PAGE > 1 else url
-        page = self.requests.get(url).text
+    def _get_paginated_page(self, url: str) -> str:
+        page_pattern = "?page={}" if url.endswith('list/') else "page/{}"
+        page_part = page_pattern.format(g.PAGE) if g.PAGE > 1 else ''
+        url = '{}{}'.format(page_part, url) if url.startswith('?s') else '{}{}'.format(url, page_part)
+        return self.requests.get(url).text
 
+    def _get_posts(self, page: str, mediatype: str) -> list:
         posts = self._extract_posts_meta(
             page, mediatype,
             lambda soup: soup.find_all('div', class_="content-box"),
@@ -95,11 +99,3 @@ class Shahed4u(Provider):
         show['info']['title'] = show_breadcrumb.get_text()
         show['url'] = show_breadcrumb.get('href')
         show['args'] = g.create_args(show)
-
-    def _get_current_page_number(self, soup):
-        return self._extract_current_page_number(
-            soup,
-            selectors=[
-                lambda pages_tag: pages_tag.select_one('span.current')
-            ]
-        )

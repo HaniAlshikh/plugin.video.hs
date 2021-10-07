@@ -42,3 +42,6 @@ class MetadataHandler:
             item['provider'] = item['origin']
         if 'خاص' in item['provider']:
             item['display_name'] = item['provider'] + ' ' + item['quality']
+
+        if item.get('url'):
+            item['url'] = item['url'].strip()
