@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
-import bs4
 from bs4 import BeautifulSoup
 
 from resources.lib.modules.globals import g
@@ -19,45 +18,6 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
-    def get_movies_categories(self) -> list:
-        return []
-
-    def get_movies_list(self, category: str) -> list:
-        page = self._get_paginated_page(category)
-        return self._get_posts(page, g.MEDIA_MOVIE)
-
-    def get_shows_categories(self) -> list:
-        return []
-
-    def get_shows_list(self, category: str) -> list:
-        page = self._get_paginated_page(category)
-        return self._get_posts(page, g.MEDIA_SHOW)
-
-    def get_shows_seasons(self, url: str) -> list:
-        return []
-
-    def get_season_episodes(self, url: str) -> list:
-        return []
-
-    def search(self, query, mediatype: str) -> list:
-        return []
-
-    def get_sources(self, url: str) -> list:
-        return []
-
-    def _get_posts(self, page: str, mediatype: str) -> list:
-        return []
-
-    def _get_current_page_number(self, soup: bs4.BeautifulSoup) -> int:
-        return self._extract_current_page_number(soup)
-
-    def _get_paginated_page(self, url: str) -> str:
-        return url
-
-    ###################################################
-    # HELPERS
-    ###################################################
-
     def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
         categories = []
         soup = BeautifulSoup(page, 'html.parser')
@@ -72,22 +32,20 @@ class Provider:
         posts = []
         soup = BeautifulSoup(page, 'html.parser')
 
-        from collections import defaultdict
         duplicates = {}  # used mostly to filter episodes
         for post_tag in posts_tag(soup):
-            poster = params.get('poster')(post_tag) if params.get('poster') else ''
+            poster = (params.get('poster') or self._none)(post_tag)
             if mediatype == g.MEDIA_SHOW and poster and duplicates.get(poster):
                 continue
 
-            post = defaultdict(dict)
-            post['info']['title'] = params.get('title')(post_tag)
-            post['info']['mediatype'] = mediatype
+            post = MetadataHandler.media(
+                title=(params.get('title') or self._none)(post_tag),
+                mediatype=mediatype,
+                poster=poster,
+                url=(params.get('url') or self._none)(post_tag),
+                provider=self.name,
 
-            post['art']['poster'] = poster
-
-            post['url'] = params.get('url')(post_tag)
-            post['provider'] = self.name
-            post['args'] = g.create_args(post)
+            )
 
             if params.get('edit_meta'):
                 params['edit_meta'](post)
@@ -96,7 +54,7 @@ class Provider:
             duplicates[poster] = post
 
         if params.get('include_page'):
-            page = self._get_current_page_number(soup)
+            page = self._extract_current_page_number(soup)
             if page:
                 posts.append(page + 1)
 
@@ -164,3 +122,7 @@ class Provider:
             poster.save(poster_path, format='png')
 
         return poster_path
+
+    @staticmethod
+    def _none(*args):
+        return None

@@ -2,13 +2,13 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers.media.media_provider import MediaProvider
 from resources.lib.modules.providers.provider_utils import get_img_src
 
 from bs4 import BeautifulSoup
-from resources.lib.modules.providers.provider import Provider
 
 
-class Shahed4u(Provider):
+class Shahed4u(MediaProvider):
     def __init__(self):
         super().__init__(
             'شاهد فور يو',
