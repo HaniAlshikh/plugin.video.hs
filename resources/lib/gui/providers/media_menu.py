@@ -59,7 +59,7 @@ class MediaMenu(ProviderMenu):
             seasons_list = self.api.get_shows_seasons(url)
         except Exception:
             seasons_list = []
-        if not seasons_list:
+        if not seasons_list or len(seasons_list) == 1:
             return self.episodes(url)
         self.list_builder.season_list_builder(seasons_list)
 

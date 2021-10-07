@@ -13,6 +13,9 @@ class MetadataHandler:
     def improve_media(item):
         item['info']['title'] = clean_up_string(item['info']['title'])
 
+        if item.get('url'):
+            item['url'] = item['url'].strip()
+
         if item.get('art'):
             if item['art'].get('poster'):
                 if not item['art'].get('fanart'): item['art']['fanart'] = item['art']['poster']

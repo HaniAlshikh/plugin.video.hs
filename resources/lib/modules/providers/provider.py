@@ -89,6 +89,9 @@ class Provider:
             post['provider'] = self.name
             post['args'] = g.create_args(post)
 
+            if params.get('edit_meta'):
+                params['edit_meta'](post)
+
             posts.append(post)
             duplicates[poster] = post
 

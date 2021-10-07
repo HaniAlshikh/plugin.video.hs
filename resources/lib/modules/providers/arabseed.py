@@ -82,23 +82,20 @@ class Arabseed(Provider):
         return self.requests.get(url).text
 
     def _get_posts(self, page: str, mediatype: str) -> list:
-        posts = self._extract_posts_meta(
+        return self._extract_posts_meta(
             page, mediatype,
             lambda soup: soup.select_one('ul.Blocks-UL').find_all('a'),
             title=lambda post_tag: post_tag.find('h4').get_text(),
             poster=lambda post_tag: get_img_src(post_tag.find('img')),
             plot=lambda post_tag: post_tag.select_one('div.Story').get_text(),
             url=lambda post_tag: post_tag.get('href'),
+            edit_meta=self._improve_show_meta,
             include_page=True
         )
 
-        for post in posts:
-            if isinstance(post, dict) and post['info']['mediatype'] == g.MEDIA_SHOW:
-                self._improve_show_meta(post)
-
-        return posts
-
     def _improve_show_meta(self, show):
+        if not show['info']['mediatype'] == g.MEDIA_SHOW:
+            return
         show['info']['title'] = show['info']['title'].split('الحلقة')[0]
         show['info']['plot'] = '' # it's not really useful here
         show['args'] = g.create_args(show)

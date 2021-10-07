@@ -20,7 +20,7 @@ class Shahed4u(Provider):
         return self._get_categories('home5/', 2)
 
     def get_shows_categories(self) -> list:
-        missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}categorie/مسلسلات عربي'.format(self.requests.base)}]
+        missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}category/مسلسلات-عربي/'.format(self.requests.base)}]
         categories = self._get_categories('home5/', 3)
         categories.extend(missing_categories)
         return categories
@@ -77,22 +77,19 @@ class Shahed4u(Provider):
         return self.requests.get(url).text
 
     def _get_posts(self, page: str, mediatype: str) -> list:
-        posts = self._extract_posts_meta(
+        return self._extract_posts_meta(
             page, mediatype,
             lambda soup: soup.find_all('div', class_="content-box"),
             title=lambda post_tag: post_tag.a.get('title'),
             poster=lambda post_tag: get_img_src(post_tag.find('a', class_="image").find('img')),
             url=lambda post_tag: post_tag.a.get('href'),
+            edit_meta=self._improve_show_meta,
             include_page=True
         )
 
-        for post in posts:
-            if isinstance(post, dict) and post['info']['mediatype'] == g.MEDIA_SHOW:
-                self._improve_show_meta(post)
-
-        return posts
-
     def _improve_show_meta(self, show):
+        if not show['info']['mediatype'] == g.MEDIA_SHOW:
+            return
         page = self.requests.get(show['url']).text
         soup = BeautifulSoup(page, 'html.parser')
         show_breadcrumb = soup.select_one("div.breadcrumb > a:nth-child(3)")
