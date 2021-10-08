@@ -12,10 +12,10 @@ class Request:
     def __init__(self, base: str):
         self.base = base
 
-    def get(self, url: str = ''):
+    def get(self, url: str = '', headers: dict = None):
         url = self.prep_url(url)
         g.log('GET: Requesting: ' + url)
-        r = requests.get(url)
+        r = requests.get(url, headers=headers, timeout=(3.05, 50))
         r.encoding = 'utf-8'
         return r
 
@@ -27,7 +27,7 @@ class Request:
         return r
 
     def prep_url(self, url):
-        url = self.base + url if urlparse(self.base).netloc not in url else url
+        url = self.base + url if not url.startswith('http') else url
         url = url.strip()
         url = url.replace(' ', '+') if any(s in url for s in ['?s', 'search']) else url.replace(' ', '-')
         return url

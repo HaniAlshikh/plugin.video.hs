@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.common.tools import clean_up_string
 from resources.lib.modules.globals import g
-from resources.lib.modules.providers.provider_utils import get_info
+from resources.lib.modules.providers.provider_utils import get_info, get_quality
 
 
 class MetadataHandler:
@@ -23,6 +23,20 @@ class MetadataHandler:
         media['args'] = g.create_args(media)
 
         return media
+
+    @staticmethod
+    def source(**params):
+        source = {}
+
+        source['display_name'] = params.get('display_name')
+        source['release_title'] = params.get('release_title')
+        source['url'] = params.get('url')
+        source['quality'] = params.get('quality')
+        source['type'] = params.get('type')
+        source['provider'] = params.get('provider')
+        source['origin'] = params.get('origin')
+
+        return source
 
     @staticmethod
     def improve_media(item):
@@ -49,17 +63,23 @@ class MetadataHandler:
 
     @staticmethod
     def improve_source(item):
+        if not item.get('provider'):
+            from urllib.parse import urlparse
+            item['provider'] = urlparse(item['url']).netloc
+        if 'خاص' in item['provider']:
+            item['display_name'] = item['provider'] + ' ' + item['quality']
+
+        item['quality'] = get_quality(item.get('quality'))
+
+        if not item.get('display_name'):
+            item['display_name'] = item['provider'] + ' ' + item['quality']
+
         if item.get('display_name'):
             item['display_name'] = clean_up_string(item['display_name'])
 
         if item.get('release_title'):
             item['release_title'] = clean_up_string(item['release_title'])
             item['info'] = get_info(item['release_title'])
-
-        if not item.get('provider'):
-            item['provider'] = item['origin']
-        if 'خاص' in item['provider']:
-            item['display_name'] = item['provider'] + ' ' + item['quality']
 
         if item.get('url'):
             item['url'] = item['url'].strip()

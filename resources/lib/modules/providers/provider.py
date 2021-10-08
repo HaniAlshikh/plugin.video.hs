@@ -44,7 +44,6 @@ class Provider:
                 poster=poster,
                 url=(params.get('url') or self._none)(post_tag),
                 provider=self.name,
-
             )
 
             if params.get('edit_meta'):
@@ -87,19 +86,15 @@ class Provider:
 
         soup = BeautifulSoup(page, 'html.parser')
         for source_tag in sources_tag(soup):
-            quality = get_quality(params.get('quality')(source_tag))
-            provider = params.get('provider')(source_tag)
-            source = {
-              'display_name': provider + ' ' + quality,
-              'release_title': params.get('release_title')(soup),
-              'url': params.get('url')(source_tag),
-              'quality': quality,
-              'type': params.get('type'),
-              'provider': provider,
-              'origin': self.name
-            }
-
-            MetadataHandler.improve_source(source)
+            source = MetadataHandler.source(
+                display_name=(params.get('display_name') or self._none)(source_tag),
+                release_title=(params.get('release_title') or self._none)(source_tag),
+                url=(params.get('url') or self._none)(source_tag),
+                quality=(params.get('quality') or self._none)(source_tag),
+                type=(params.get('type') or self._none)(source_tag),
+                provider=(params.get('provider') or self._none)(source_tag),
+                origin=self.name,
+            )
             sources.append(source)
 
         return sources
