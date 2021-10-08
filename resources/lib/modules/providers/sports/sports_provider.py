@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+import datetime
+
 from resources.lib.common.tools import get_current_datetime_for_time
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.provider import Provider
@@ -23,11 +25,21 @@ class SportsProvider(Provider):
             playing_time
         )
 
+    def _generate_overview(self, commentator, channel, league, results=None):
+        return '''
+        النتيجة: {}
+        المعلق: {}
+        القناة: {}
+        الدوري: {}
+        '''.format(results or '-', commentator, channel, league)
+
     def _improve_game_meta(self, game):
         playing_time = game['info']['title'].split('الساعة')[1]
         try:
-            game['info']['premiered'] = get_current_datetime_for_time(playing_time, g.DATE_TIME_FORMAT)
+            game['info']['aired'] = get_current_datetime_for_time(playing_time, g.DATE_TIME_FORMAT)
         except Exception:
             pass
+        if game['info'].get('last_watched_at'):
+            game['info']['last_watched_at'] = game['info']['aired'] or datetime.datetime.today().strftime(g.DATE_TIME_FORMAT)
         game['info']['duration'] = 6300
         game['info']['genre'] = ['sports']

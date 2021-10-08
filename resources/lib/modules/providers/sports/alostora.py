@@ -3,9 +3,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from bs4 import BeautifulSoup
-
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers.handlers.Alba_player import AlbaPlayer
 
 from resources.lib.modules.providers.sports.sports_provider import SportsProvider
 
@@ -19,68 +18,62 @@ class Alostora(SportsProvider):
         )
 
     def get_games_list(self) -> list:
-        page = self.requests.get().text
-
-        def get_title(game_div):
+        def construct_title(game_div):
             return self._generate_title(
                 game_div.find('div', class_='team-first').find('div', {'class': re.compile(".*team_title")}).get_text(),
                 game_div.find('div', class_='team-second').find('div', {'class': re.compile(".*team_title")}).get_text(),
                 game_div.find('div', {'class': 'matchTime'}).get_text()
             )
 
-        def get_poster(game_div):
-            try:
-                return self._generate_game_art(
-                    game_div.find('div', class_='team-first').find('img').get('src'),
-                    game_div.find('div', class_='team-first').find('div', {'class': re.compile(".*team_title")}).get_text(),
-                    game_div.find('div', class_='team-second').find('img').get('src'),
-                    game_div.find('div', class_='team-second').find('div', {'class': re.compile(".*team_title")}).get_text(),
-                    banner=True
-                )
-            except Exception:
-                return ''
+        def construct_poster(game_div):
+            return self._generate_game_art(
+                game_div.find('div', class_='team-first').find('img').get('src'),
+                game_div.find('div', class_='team-first').find('div', {'class': re.compile(".*team_title")}).get_text(),
+                game_div.find('div', class_='team-second').find('img').get('src'),
+                game_div.find('div', class_='team-second').find('div', {'class': re.compile(".*team_title")}).get_text(),
+                banner=True
+            )
 
-        return self._extract_posts_meta(
+        def construct_overview(game_div):
+            info = game_div.find(class_='events-info')
+            return self._generate_overview(
+                info.select_one('span.mic').get_text(),
+                info.select_one('span.tv').get_text(),
+                info.select_one('span.cup').get_text(),
+                '-'.join(map(lambda r: r.get_text(), game_div.find(class_='matchResult').find_all(class_='result')))
+            )
+
+        page = self.requests.get().text
+        games = self._extract_posts_meta(
             page, g.MEDIA_MOVIE,
             lambda soup: soup.find('div', id="today").div,
-            title=get_title,
-            poster=get_poster,
+            title=construct_title,
+            poster=construct_poster,
             url=lambda post_tag: post_tag.a.get('href'),
-            edit_meta=self._improve_game_meta,
+            overview=construct_overview,
+            last_watched_at= lambda post_tag: 'finshed' if 'finshed' in post_tag['class'] else None,
+            edit_meta=self._improve_game_meta
         )
 
+        # TODO: find a better way
+        sorted_games = []
+        finished_games = []
+        for game in games:
+            if game['info'].get('last_watched_at'):
+                finished_games.append(game)
+            else:
+                sorted_games.append(game)
+        sorted_games.extend(finished_games)
+
+        return sorted_games
+
     def get_sources(self, url: str):
-        def get_sources(soup):
-            sources = []
-            for iframe in soup.find_all('iframe'):
-                page = self.requests.get(iframe.get('src'), headers={'Referer': '/'.join(url.split('/')[:3])}).text
-                soup = BeautifulSoup(page, 'html.parser')
-                sources.extend(soup.find(class_="albaplayer_name").find_all("a"))
-            return sources
-
-        def get_url(source_div):
-            channel_link = source_div.get('href')
-            response = self.requests.get(channel_link, headers={'Referer': '/'.join(url.split('/')[:3])})
-            channel_soup = BeautifulSoup(response.text, 'html.parser')
-            player = channel_soup.select_one('div#player')
-            if player:
-                script = player.next_sibling
-                g.log('script: ' + str(script.string))
-                encoded_link = re.search('AlbaPlayerControl\(\'(.*)\'.*', script.string).group(1)
-                import base64
-                return base64.b64decode(encoded_link).decode('utf-8')
-            iframe = channel_soup.find('iframe')
-            if iframe:
-                return iframe.get('src').strip()
-            return ''
-
         page = self.requests.get(url).text
         return self._extract_sources_meta(
             page,
-            get_sources,
+            lambda soup: AlbaPlayer.get_sources(soup, url),
             provider=lambda source_div: source_div.get_text(),
-            # release_title=lambda soup: soup.find('h1').get_text(),
-            quality=lambda a_tag: 'livestream',
-            url=get_url,
-            type=lambda a_tag: 'livestream'
+            quality=lambda source_div: 'livestream',
+            url=lambda source_div: AlbaPlayer.get_url(source_div, url),
+            type=lambda source_div: 'livestream'
         )

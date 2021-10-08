@@ -183,7 +183,7 @@ class ListBuilder(object):
                     )
                     and not no_paging
                     # and len(list_items) >= self.page_limit
-                    and g.PAGE
+                    and g.PAGE > 1
                 ):
                     g.REQUEST_PARAMS["page"] = g.PAGE + 1
                     if next_args:
@@ -279,6 +279,7 @@ class ListBuilder(object):
             if release_date:
                 release_day = tools.parse_datetime(release_date, g.DATE_TIME_FORMAT).strftime("%d %b")
                 name = "[{}] {}".format(release_day, name)
+
         item.update({"name": name})
         item["info"]["title"] = name
 

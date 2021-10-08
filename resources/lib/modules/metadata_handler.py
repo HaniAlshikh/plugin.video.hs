@@ -13,15 +13,17 @@ class MetadataHandler:
         from collections import defaultdict
         media = defaultdict(dict)
 
-        media['info']['title'] = params.get('title')
-        media['info']['mediatype'] = params.get('mediatype')
+        if params.get('title'): media['info']['title'] = params.get('title')
+        if params.get('overview'): media['info']['overview'] = params.get('overview')
+        if params.get('last_watched_at'): media['info']['last_watched_at'] = params.get('last_watched_at')
+        if params.get('mediatype'): media['info']['mediatype'] = params.get('mediatype')
 
-        media['art']['poster'] = params.get('poster')
+        if params.get('poster'): media['art']['poster'] = params.get('poster')
 
-        media['url'] = params.get('url')
-        media['provider'] = params.get('provider')
+        if params.get('url'): media['url'] = params.get('url')
+        if params.get('provider'): media['provider'] = params.get('provider')
+
         media['args'] = g.create_args(media)
-
         return media
 
     @staticmethod
@@ -40,7 +42,19 @@ class MetadataHandler:
 
     @staticmethod
     def improve_media(item):
-        item['info']['title'] = clean_up_string(item['info']['title'])
+        if item.get('info'):
+            if item['info'].get('title'):
+                item['info']['title'] = clean_up_string(item['info']['title'])
+
+            g.log(item['info']['overview'])
+            if item['info'].get('overview') and not item['info'].get('plot'):
+                item['info']['plot'] = item['info']['overview']
+
+            if item['info'].get('plot') and not item['info'].get('plotoutline'):
+                item['info']['plotoutline'] = item['info']['plot']
+
+            if item['info'].get('plot') and not item['info'].get('overview'):
+                item['info']['overview'] = item['info']['plot']
 
         if item.get('url'):
             item['url'] = item['url'].strip()
