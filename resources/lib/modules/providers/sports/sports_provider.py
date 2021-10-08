@@ -25,6 +25,9 @@ class SportsProvider(Provider):
 
     def _improve_game_meta(self, game):
         playing_time = game['info']['title'].split('الساعة')[1]
-        game['info']['premiered'] = get_current_datetime_for_time(playing_time, g.DATE_TIME_FORMAT)
+        try:
+            game['info']['premiered'] = get_current_datetime_for_time(playing_time, g.DATE_TIME_FORMAT)
+        except Exception:
+            pass
         game['info']['duration'] = 6300
         game['info']['genre'] = ['sports']

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
+from resources.lib.modules.metadata_handler import MetadataHandler
 from resources.lib.modules.resolvers import Resolver
 
 
@@ -22,4 +23,6 @@ class ResolverHelper:
 
     @staticmethod
     def clean_up_sources(sources: list) -> list:
+        for source in sources:
+            MetadataHandler.improve_source(source)
         return Resolver().cleanup_sources(sources)

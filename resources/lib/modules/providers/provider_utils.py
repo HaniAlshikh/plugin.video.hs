@@ -42,6 +42,8 @@ def get_quality(release_title):
     :param release_title: sources release title
     :return: stringed resolution
     """
+    if not release_title:
+        release_title = ''
     release_title = release_title.lower()
     quality = "SD"
     if "4k" in release_title:

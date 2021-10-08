@@ -67,10 +67,6 @@ class MediaMenu(ProviderMenu):
         episodes_list = self.api.get_season_episodes(url)
         self.list_builder.episode_list_builder(episodes_list)
 
-    def sources(self, url: str):
-        sources = self.api.get_sources(url)
-        return sources
-
     def search(self, query: str, mediatype: str):
         search_list = self.get_search_results(query, mediatype)
         if mediatype == g.MEDIA_MOVIE:
