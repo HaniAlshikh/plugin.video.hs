@@ -1318,6 +1318,14 @@ class GlobalVariables(object):
         del k
         return input_value
 
+    def get_option_input(self, heading: str = 'يرجى الاختيار', options: dict = None):
+        option = xbmcgui.Dialog().select(
+            "{}: {}".format(g.ADDON_NAME, heading), [*options.keys()]
+        )
+        if option == -1:
+            return None
+        return [*options.values()][option]
+
     def json_rpc(self, method, params=None):
         request_data = {
             "jsonrpc": "2.0",

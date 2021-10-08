@@ -15,7 +15,9 @@ class Request:
     def get(self, url: str = '', headers: dict = None):
         url = self.prep_url(url)
         g.log('GET: Requesting: ' + url)
-        r = requests.get(url, headers=headers, timeout=(3.05, 50))
+        # r = requests.get(url, headers=headers)
+        from resources.lib.modules.scrapers.request import Request
+        r = Request().get(url, headers=headers)
         r.encoding = 'utf-8'
         return r
 

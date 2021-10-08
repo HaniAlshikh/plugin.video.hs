@@ -1,24 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import re
-from typing import TYPE_CHECKING
-
-import bs4
-
-from resources.lib.common.exceptions import try_and_log
 from resources.lib.modules.globals import g
-from resources.lib.modules.metadata_handler import MetadataHandler
-from resources.lib.modules.providers.provider_utils import get_quality, get_img_src
-
-from bs4 import BeautifulSoup
-from resources.lib.modules.providers.provider import Provider
-
-import os
-import sys
+from resources.lib.modules.providers.media.media_provider import MediaProvider
+from resources.lib.modules.providers.provider_utils import get_img_src
 
 
-class Arabseed(Provider):
+class Arabseed(MediaProvider):
     def __init__(self):
         super().__init__(
             'عرب سيد',

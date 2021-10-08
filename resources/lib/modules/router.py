@@ -103,20 +103,11 @@ def dispatch(params):
     ######################################################
 
     elif action == "search":
-        mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW}
-        mediatype = xbmcgui.Dialog().select(
-            "{}: {}".format(g.ADDON_NAME, 'بحث عن'), [*mediatypes.keys()]
-        )
-        if mediatype == -1: return
-        query = g.get_keyboard_input('البحث')
-        from resources.lib.gui.providersMenus import ProviderMenus
-        ProviderMenus().PROVIDERS[action_args["provider"]].search(query, [*mediatypes.values()][mediatype])
+        _search(provider=action_args['provider'])
 
-    elif action == "moviesSearch" or action == "showsSearch":
-        mediatype = g.MEDIA_MOVIE if action == "moviesSearch" else g.MEDIA_SHOW
-        from resources.lib.gui.providersMenus import ProviderMenus
-        query = fix_arabic(action_args) if isinstance(action_args, str) else None
-        ProviderMenus().search(mediatype, query)
+    elif action == "searchMovies" or action == "searchShows":
+        mediatype = g.MEDIA_MOVIE if action == "searchMovies" else g.MEDIA_SHOW
+        _search(fix_arabic(params.get('query')), mediatype, params.get('provider'))
 
     ######################################################
     # SERVICES
@@ -126,3 +117,22 @@ def dispatch(params):
         from resources.lib.debrid import real_debrid
 
         real_debrid.RealDebrid().auth()
+
+    ######################################################
+    # HELPERS
+    ######################################################
+
+
+def _search(query=None, mediatype=None, provider=None):
+    if not mediatype:
+        mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW}
+        mediatype = g.get_option_input('بحث عن', mediatypes)
+        if not mediatype:
+            return
+        mediatype = [*mediatypes.values()][mediatype]
+
+    if not query:
+        query = g.get_keyboard_input('البحث')
+
+    from resources.lib.gui.providersMenus import ProviderMenus
+    ProviderMenus().PROVIDERS[provider].search(query, mediatype)
