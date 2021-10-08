@@ -150,13 +150,19 @@ class Resolver:
         # https://google-me.h.live/hls/113132/85565524.m3u8
 
         stream_link = None
+        g.log('Resolvinig live stream: ' + source['display_name'])
+
+        if 'vimeo' in source['url']:
+            from resources.lib.modules.resolvers.third_party.vimeo_downloader import Vimeo
+            v = Vimeo(source['url'])
+            stream_link = v.streams[-1].direct_url
 
         # https://d1komd5x2s5yw0.cloudfro494d8ad3bb3308b6ff7e/index.m3u8
-        if source["url"].endswith('m3u') or source["url"].endswith('m3u8'):
+        elif source["url"].endswith('m3u') or source["url"].endswith('m3u8'):
             stream_link = source["url"]
 
         # https://livehd7.live/ch/bein9.html?stream_url=https://d1komd5x2s5yw0.cloudfront.net/out/v1/e187e3dex_3.m3u8&autoplay=false
-        if 'stream_url' in source["url"]:
+        elif 'stream_url' in source["url"]:
             import re
             stream_link = re.search('.*stream_url=(.*).m3u.*', source["url"]).group(1) + '.m3u8'
 

@@ -32,10 +32,10 @@ class HomeMenus:
         #                          description=g.get_language_string(30402))
         # else:
         g.add_directory_item(g.get_language_string(30025),
-                             action='moviesSearch',
+                             action='searchMovies',
                              description=g.get_language_string(30399))
         g.add_directory_item(g.get_language_string(30026),
-                             action='showsSearch',
+                             action='searchShows',
                              description=g.get_language_string(30400))
         g.close_directory(g.CONTENT_FOLDER)
 

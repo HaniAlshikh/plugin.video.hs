@@ -53,9 +53,7 @@ class Provider:
             duplicates[poster] = post
 
         if params.get('include_page'):
-            page = self._extract_current_page_number(soup)
-            if page:
-                posts.append(page + 1)
+            g.PAGE = self._extract_current_page_number(soup)
 
         return posts
 
