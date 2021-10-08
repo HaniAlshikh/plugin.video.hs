@@ -45,11 +45,10 @@ class Arabseed(MediaProvider):
         return self._extract_sources_meta(
             page,
             lambda soup: soup.find('div', class_="DownloadArea").find_all("a", class_='downloadsLink'),
-            release_title=lambda soup: soup.find('title').get_text(),
             quality=lambda a_tag: a_tag.p.get_text(),
             provider=lambda a_tag: a_tag.span.get_text(),
             url=lambda a_tag: a_tag.get('href'),
-            type='hoster'
+            type=lambda a_tag: 'hoster'
         )
 
     ###################################################

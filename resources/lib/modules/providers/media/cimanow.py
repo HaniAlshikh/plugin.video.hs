@@ -4,12 +4,10 @@ from __future__ import absolute_import, division, unicode_literals
 from bs4 import BeautifulSoup
 
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers.media.media_provider import MediaProvider
 from resources.lib.modules.providers.provider_utils import get_img_src
 
-from resources.lib.modules.providers.provider import Provider
-
-
-class Cimanow(Provider):
+class Cimanow(MediaProvider):
     def __init__(self):
         super().__init__(
             'سيما ناو',
@@ -70,7 +68,7 @@ class Cimanow(Provider):
             quality=lambda a_tag: 'Unknown',
             provider=lambda a_tag: a_tag.get_text(),
             url=lambda a_tag: a_tag.get('href'),
-            type='hoster'
+            type=lambda a_tag: 'hoster'
         )
 
     ###################################################

@@ -46,7 +46,6 @@ class MetadataHandler:
             if item['info'].get('title'):
                 item['info']['title'] = clean_up_string(item['info']['title'])
 
-            g.log(item['info']['overview'])
             if item['info'].get('overview') and not item['info'].get('plot'):
                 item['info']['plot'] = item['info']['overview']
 

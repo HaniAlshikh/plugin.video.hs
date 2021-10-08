@@ -50,11 +50,10 @@ class Shahed4u(MediaProvider):
         return self._extract_sources_meta(
             page,
             lambda soup: soup.find(class_="download-media").find_all("a"),
-            release_title=lambda soup: soup.find('h1').get_text(),
             quality=lambda a_tag: a_tag.find('span', class_='quality').get_text(),
             provider=lambda a_tag: a_tag.find('span', class_='name').get_text(),
             url=lambda a_tag: a_tag.get('href'),
-            type='hoster'
+            type=lambda a_tag: 'hoster'
         )
 
     ###################################################

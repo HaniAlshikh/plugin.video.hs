@@ -76,12 +76,22 @@ class ProviderMenus:
         )
         g.close_directory(g.CONTENT_FOLDER)
 
-    def search(self, mediatype, query=None):
+    def search(self, query=None, mediatype=None, provider=None):
+        if provider:
+            if not mediatype:
+                mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW}
+                mediatype = g.get_option_input('بحث عن', mediatypes)
+                if not mediatype:
+                    return
+
         if query is None:
             query = g.get_keyboard_input(heading=g.get_language_string(30013))
             if not query:
                 g.cancel_directory()
                 return
+
+        if provider:
+            self.PROVIDERS[provider].search(query, mediatype)
 
         # if g.get_bool_setting("searchHistory"):
         #     SearchHistory().add_search_history("movie", query)

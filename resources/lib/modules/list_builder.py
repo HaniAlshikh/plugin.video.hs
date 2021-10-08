@@ -183,8 +183,9 @@ class ListBuilder(object):
                     )
                     and not no_paging
                     # and len(list_items) >= self.page_limit
-                    and g.PAGE > 1
+                    and g.PAGE > 0
                 ):
+                    g.log('Page: ' + str(g.PAGE))
                     g.REQUEST_PARAMS["page"] = g.PAGE + 1
                     if next_args:
                         g.REQUEST_PARAMS["action_args"] = next_args
