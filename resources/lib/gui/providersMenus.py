@@ -18,14 +18,14 @@ class ProviderMenus:
 
     def _init_providers(self):
         self.providers_media = {
-            'shahed4u': Shahed4uMenu(),
-            'cimanow': CimanowMenu(),
             'arabseed': ArabseedMenu(),
+            'shahed4u': Shahed4uMenu(),
+            'cimanow': CimanowMenu()
         }
         self.providers_sports = {
-            'asgoal': AsgoalMenu(),
-            'yallalive': YallaliveMenu(),
             'alostora': AlostoraMenu(),
+            'asgoal': AsgoalMenu(),
+            'yallalive': YallaliveMenu()
         }
 
         self.PROVIDERS = {**self.providers_media, **self.providers_sports}

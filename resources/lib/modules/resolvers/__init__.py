@@ -98,7 +98,8 @@ class Resolver:
                 return stream_link
             else:
                 g.log("Failed to resolve source: {}".format(source), "error")
-        except ResolverFailure as e:
+        # except ResolverFailure as e: TODO: better error handling
+        except Exception as e:
             g.log('Failed to resolve source: {}'.format(e))
 
     @staticmethod
