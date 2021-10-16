@@ -980,6 +980,7 @@ class GlobalVariables(object):
 
     def close_all_dialogs(self):
         xbmc.executebuiltin("Dialog.Close(all,true)")
+        xbmc.executebuiltin("Dialog.Close(notification,true)")
 
     def close_ok_dialog(self):
         xbmc.executebuiltin("Dialog.Close(okdialog, true)")
@@ -988,9 +989,12 @@ class GlobalVariables(object):
         xbmc.executebuiltin("Dialog.Close(busydialog)")
         xbmc.executebuiltin("Dialog.Close(busydialognocancel)")
 
-    def play_media(self, action: str, **params):
+    def play_media_hs(self, action: str, **params):
         path = '{}?action={}&from_widget=false'.format(self.BASE_URL, action)
         for k, v in params.items(): path += '&{}={}'.format(k, v)
+        self.play_media(path)
+
+    def play_media(self, path: str):
         self.close_all_dialogs()
         xbmc.executebuiltin('PlayMedia({})'.format(path))
 
