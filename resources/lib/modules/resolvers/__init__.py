@@ -130,33 +130,22 @@ class Resolver:
             return
 
     def _handle_livestream_resolving(self, source, item_information):
-        # https://s-37.streamtec.xyz/hls7/stream.m3u8
-        # https://memotec.xyz/ch7/
-        ##
-        # https://memotec.xyz/ch14/
-        # https://s-37.streamtec.xyz/hls14/stream.m3u8
-        ##
-        # https://memotec.xyz/ch17/
-        # https://s-36.streamtec.xyz/hls17/stream.m3u8
-
-        # https://wigistream.to/embed/1ng0avbe
-        # https://engrnaopxgmyxmtg.wzcdn988.net:8443/hls/1ng0avbe.m3u8?s=NBusgYPkUFOhIa7TSxpmlg&e=1633565001
-        ##
-        # https://wigistream.to/embed/a5to6280244jw16
-        # https://engrnaopxgmyxmtg.wzcdn988.net:8443/hls/a5to6280244jw16.m3u8?s=JxNkLia7VC9MlNdYTmQXvQ&e=1633565312
-
-        # https://vimeo.com/event/1355523/embed
-        #
-
-        # https://google-me.h.live/hls/113132/85565524.m3u8
-
         stream_link = None
         g.log('Resolvinig live stream: ' + source['display_name'])
 
-        if 'vimeo' in source['url']:
-            from resources.lib.modules.resolvers.third_party.vimeo_downloader import Vimeo
-            v = Vimeo(source['url'])
-            stream_link = v.streams[-1].direct_url
+        if 'youtube' in source['url']:
+            if '?v=' in source['url']:
+                stream_link = tools.youtube_url.format(source['url'].split("?v=")[-1])
+            else:
+                stream_link = tools.youtube_url.format(source['url'].split("/")[-1])
+
+        elif 'vimeo' in source['url']:
+            # TODO
+            return None
+
+        elif 'ragnarp' in source['url']:
+            # TODO:
+            return None
 
         # https://d1komd5x2s5yw0.cloudfro494d8ad3bb3308b6ff7e/index.m3u8
         elif source["url"].endswith('m3u') or source["url"].endswith('m3u8'):

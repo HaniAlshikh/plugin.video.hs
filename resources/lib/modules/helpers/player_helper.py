@@ -20,17 +20,17 @@ class PlayerHelper:
             player = p._play_link(stream_link)
             while not g.is_window_visible('fullscreenvideo'):
                 g.log('waiting for Player to process: ' + stream_link)
-                if g.is_window_visible('okdialog'):
+                if g.is_window_visible('okdialog') or g.is_window_visible('notification'):
                     g.log('faild to play: ' + stream_link)
                     break
                 g.sleep(500)
 
             if player.isPlaying():
-                g.log('found working source: ' + p.media_info['sources'][0]['display_name'])
+                g.log('found working source: ' + stream_link)
                 return
 
         if media_info['sources']:
-            g.play_media('getSources', action_args=g.create_args(p.media_info))
+            g.play_media_hs('getSources', action_args=g.create_args(p.media_info))
         else:
             g.ok_dialog('تعذر العثور على روابط للتشغيل')
 
