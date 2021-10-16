@@ -96,6 +96,10 @@ def dispatch(params):
             action_args['sources'] = ResolverHelper().clean_up_sources(sources)
             g.log('found sources: ' + str(action_args['sources']))
 
+        if source_select:
+            options = {s['display_name']: s for s in sources}
+            action_args['sources'] = [g.get_option_input(options=options)]
+
         PlayerHelper.ensure_all_sources_were_tried(action_args)
 
     ######################################################
