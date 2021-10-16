@@ -103,6 +103,7 @@ class Provider:
     def _generate_game_art(
             first_img: str, first_img_title: str, second_img: str, second_img_title: str, banner=False
     ) -> str:
+        g.log('Generating art for: {} vs {}'.format(first_img_title, second_img_title))
         try:
             first_img_title = '_'.join(first_img_title.split())
             second_img_title = '_'.join(second_img_title.split())
@@ -118,8 +119,8 @@ class Provider:
                 poster.save(poster_path, format='png')
 
             return poster_path
-        except Exception:
-            return ''
+        except Exception as e:
+            g.log(str(e), 'error')
 
     @staticmethod
     def _none(*args):
