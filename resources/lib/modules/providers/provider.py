@@ -113,6 +113,7 @@ class Provider:
             poster_path_reversed = os.path.join(g.TMP_PATH, second_img_title + 'vs' + first_img_title + extension)
             if not os.path.exists(poster_path):
                 if os.path.exists(poster_path_reversed):
+                    g.log('cached version found: {} vs {}'.format(first_img_title, second_img_title))
                     return poster_path_reversed
                 from resources.lib.common.image_generator import combine_vs
                 poster = combine_vs(first_img, second_img, banner)
