@@ -46,7 +46,7 @@ class Shahed4u(MediaProvider):
         return self._get_posts(page, mediatype)
 
     def get_sources(self, url: str) -> list:
-        page = self.requests.get(url + 'download/').text
+        page = self._get_download_page(url)
         return self._extract_sources_meta(
             page,
             lambda soup: soup.find(class_="download-media").find_all("a"),
@@ -95,3 +95,15 @@ class Shahed4u(MediaProvider):
         show['info']['title'] = show_breadcrumb.get_text()
         show['url'] = show_breadcrumb.get('href')
         show['args'] = g.create_args(show)
+
+    def _get_download_page(self, url: str):
+        page = self.requests.get(url + 'download/').text
+        import re
+        ajax_url = re.search('MyAjaxURL = \"(.*)\";.*', page).group(1)
+        media_id = re.search('data: {id: \"(.*)\"}.*', page).group(1)
+        headers = {
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        }
+        page = self.requests.post(ajax_url + 'Single/Download.php', 'id=' + media_id, headers=headers).text
+        return page
+

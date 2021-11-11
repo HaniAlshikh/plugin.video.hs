@@ -6,25 +6,25 @@ from urllib.parse import urlparse
 import requests
 
 from resources.lib.modules.globals import g
+from resources.lib.modules.scrapers.request import Request as R
 
 
 class Request:
     def __init__(self, base: str):
         self.base = base
+        self.request = R()
 
     def get(self, url: str = '', headers: dict = None):
         url = self.prep_url(url)
         g.log('GET: Requesting: ' + url)
-        # r = requests.get(url, headers=headers)
-        from resources.lib.modules.scrapers.request import Request
-        r = Request().get(url, headers=headers)
+        r = self.request.get(url, headers=headers)
         r.encoding = 'utf-8'
         return r
 
-    def post(self, url: str = '', data: dict = {}):
+    def post(self, url, data, headers: dict = None):
         url = self.prep_url(url)
         g.log('POST: Requesting: ' + url)
-        r = requests.post(url, data)
+        r = self.request.post(url, data, headers)
         r.encoding = 'utf-8'
         return r
 
