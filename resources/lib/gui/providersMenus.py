@@ -18,7 +18,7 @@ class ProviderMenus:
 
     def _init_providers(self):
         self.providers_media = {
-            'arabseed': ArabseedMenu(),
+            # 'arabseed': ArabseedMenu(),
             'shahed4u': Shahed4uMenu(),
             'cimanow': CimanowMenu()
         }
