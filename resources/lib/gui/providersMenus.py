@@ -91,7 +91,7 @@ class ProviderMenus:
                 return
 
         if provider:
-            self.PROVIDERS[provider].search(query, mediatype)
+            return self.PROVIDERS[provider].search(query, mediatype)
 
         # if g.get_bool_setting("searchHistory"):
         #     SearchHistory().add_search_history("movie", query)
