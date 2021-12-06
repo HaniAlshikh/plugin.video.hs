@@ -13,6 +13,10 @@ class HomeMenus:
         g.add_directory_item('رياضة',
                              action='sportsProvidersHome',
                              description='قائمة المواقع المدعومة لمشاهدة اخر الاحداث الرياضية')
+        g.add_directory_item('روابط اضافية',
+                             action='extraLinksMenu',
+                             description='قائمة من الروابط الاضافية بناء على ملف بصيغة json',
+                             menu_item={'art': {"thumb": g.DEFAULT_FANART}})
         g.add_directory_item(g.get_language_string(30013),
                              action='searchMenu',
                              description=g.get_language_string(30397))

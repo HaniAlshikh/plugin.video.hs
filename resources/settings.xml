@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
+
+    <!-- Interface -->
+    <category label="الرئيسية">
+		<setting type="lsep" label="عام" />
+		<setting id="general.customLinks" type="text" label="مصدر الروابط الاضافة" default=""/>
+	</category>
+
     <!-- Accounts -->
     <category label="30137">
 
