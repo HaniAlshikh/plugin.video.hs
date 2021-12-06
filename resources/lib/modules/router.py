@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-import json
-import re
-
-import xbmc
-import xbmcgui
-from xbmc import sleep
-
 from resources.lib.common.tools import fix_arabic
 from resources.lib.modules.globals import g
 from resources.lib.modules.helpers.player_helper import PlayerHelper
@@ -54,6 +47,10 @@ def dispatch(params):
     elif action == "mediaProviderMenu":
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().media_provider_menu(action_args["provider"])
+
+    elif action == "extraLinksMenu":
+        from resources.lib.gui.extraLinksMenu import ExtraLinksMenu
+        ExtraLinksMenu().extra_links()
 
     elif action == "searchMenu":
         from resources.lib.gui.homeMenu import HomeMenus
@@ -119,7 +116,6 @@ def dispatch(params):
         mediatype = g.MEDIA_MOVIE if action == "searchMoviesGlobally" else g.MEDIA_SHOW
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(mediatype=mediatype)
-
 
     ######################################################
     # SERVICES
