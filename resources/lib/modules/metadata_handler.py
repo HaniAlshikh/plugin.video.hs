@@ -76,13 +76,13 @@ class MetadataHandler:
 
     @staticmethod
     def improve_source(item):
+        item['quality'] = get_quality(item.get('quality'))
+
         if not item.get('provider'):
             from urllib.parse import urlparse
             item['provider'] = urlparse(item['url']).netloc
         if 'خاص' in item['provider']:
             item['display_name'] = item['provider'] + ' ' + item['quality']
-
-        item['quality'] = get_quality(item.get('quality'))
 
         if not item.get('display_name'):
             item['display_name'] = item['provider'] + ' ' + item['quality']

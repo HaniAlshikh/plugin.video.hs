@@ -46,15 +46,7 @@ class Shahed4u(MediaProvider):
         return self._get_posts(page, mediatype)
 
     def get_sources(self, url: str) -> list:
-        page = self._get_download_page(url)
-        return self._extract_sources_meta(
-            page,
-            lambda soup: soup.find(class_="download-media").find_all("a"),
-            quality=lambda a_tag: a_tag.find('span', class_='quality').get_text(),
-            provider=lambda a_tag: a_tag.find('span', class_='name').get_text(),
-            url=lambda a_tag: a_tag.get('href'),
-            type=lambda a_tag: 'hoster'
-        )
+        return self._get_download_sources(url) + self._get_player_sources(url)
 
     ###################################################
     # HELPERS
@@ -96,6 +88,27 @@ class Shahed4u(MediaProvider):
         show['url'] = show_breadcrumb.get('href')
         show['args'] = g.create_args(show)
 
+    def _get_download_sources(self, url: str) -> list:
+        page = self._get_download_page(url)
+        return self._extract_sources_meta(
+            page,
+            lambda soup: soup.find(class_="download-media").find_all("a"),
+            quality=lambda a_tag: a_tag.find('span', class_='quality').get_text(),
+            provider=lambda a_tag: a_tag.find('span', class_='name').get_text(),
+            url=lambda a_tag: a_tag.get('href'),
+            type=lambda a_tag: 'hoster'
+        )
+
+    def _get_player_sources(self, url: str) -> list:
+        page = self.requests.get(url + 'watch/').text
+        sources = self._extract_sources_meta(
+            page,
+            lambda soup: soup.find(class_="servers-list").find_all("li"),
+            url=lambda li_tag: {"id": li_tag.get('data-id'), "i": li_tag.get('data-i'), "meta": li_tag.get('data-meta'), "type": li_tag.get("data-type")},
+            type=lambda li_tag: 'hoster'
+        )
+        return self._get_player_source_url(page, url, sources)
+
     def _get_download_page(self, url: str):
         page = self.requests.get(url + 'download/').text
         import re
@@ -107,3 +120,15 @@ class Shahed4u(MediaProvider):
         page = self.requests.post(ajax_url + 'Single/Download.php', 'id=' + media_id, headers=headers).text
         return page
 
+    def _get_player_source_url(self, page: str, url: str, sources: list) -> list:
+        import re
+        ajax_url = re.search('MyAjaxURL = \"(.*)\";.*', page).group(1)
+        headers = {
+            'x-requested-with': 'XMLHttpRequest',
+            'Referer': url
+        }
+        for source in sources:
+            iframe = self.requests.post(ajax_url + 'Single/Server.php', source['url'], headers=headers).text
+            source['url'] = re.search('src="([^"]+)"', iframe).group(1)
+
+        return sources
