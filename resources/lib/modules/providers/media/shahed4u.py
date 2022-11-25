@@ -13,11 +13,11 @@ class Shahed4u(MediaProvider):
         super().__init__(
             'شاهد فور يو',
             "shahed4u",
-            ["https://shahed4u.land/"],
+            ["https://shahed4u.vip/"],
         )
 
     def get_movies_categories(self) -> list:
-        return self._get_categories('home5/', 2)
+        return self._get_categories('home2/', 2)
 
     def get_shows_categories(self) -> list:
         missing_categories = [{'title': 'مسلسلات عربي', 'url': '{}category/مسلسلات-عربي/'.format(self.requests.base)}]
