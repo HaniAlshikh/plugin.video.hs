@@ -7,6 +7,7 @@ from resources.lib.modules.globals import g
 from resources.lib.modules.providers.media.media_provider import MediaProvider
 from resources.lib.modules.providers.provider_utils import get_img_src
 
+
 class Cimanow(MediaProvider):
     def __init__(self):
         super().__init__(
@@ -59,17 +60,7 @@ class Cimanow(MediaProvider):
         return self._get_posts(page, mediatype)
 
     def get_sources(self, url: str):
-        page = self.requests.get(url + 'watching/').text
-        return self._extract_sources_meta(
-            page,
-            lambda soup: soup.find('li', {'aria-label': 'download'}).find_all("a"),
-            release_title=lambda a_tag: next((t.find('figure') for t in a_tag.parentGenerator() if t.find('figure')),
-                     a_tag).img['alt'],
-            quality=lambda a_tag: 'Unknown',
-            provider=lambda a_tag: a_tag.get_text(),
-            url=lambda a_tag: a_tag.get('href'),
-            type=lambda a_tag: 'hoster'
-        )
+        return self._get_download_sources(url) + self._get_player_sources(url)
 
     ###################################################
     # HELPERS
@@ -111,3 +102,41 @@ class Cimanow(MediaProvider):
             soup,
             pages_tag=lambda soup: soup.find('ul', {'aria-label': 'pagination'})
         )
+
+    def _get_download_sources(self, url: str) -> list:
+        page = self.requests.get(url + 'watching/').text
+        return self._extract_sources_meta(
+            page,
+            lambda soup: soup.find('li', {'aria-label': 'download'}).find_all("a"),
+            release_title=lambda a_tag: next((t.find('figure') for t in a_tag.parentGenerator() if t.find('figure')),
+                                             a_tag).img['alt'],
+            quality=lambda a_tag: 'Unknown',
+            provider=lambda a_tag: a_tag.get_text(),
+            url=lambda a_tag: a_tag.get('href'),
+            type=lambda a_tag: 'hoster'
+        )
+
+    def _get_player_sources(self, url: str) -> list:
+        page = self.requests.get(url + 'watching/').text
+        sources = self._extract_sources_meta(
+            page,
+            lambda soup: soup.find(id="watch").find_all("li", {"data-index": True}),
+            provider=lambda li_tag: li_tag.get_text(),
+            url=lambda li_tag: {"id": li_tag.get('data-id'), "i": li_tag.get('data-index')},
+            type=lambda li_tag: 'hoster'
+        )
+        return self._get_player_source_url(page, url, sources)
+
+    def _get_player_source_url(self, page: str, url: str, sources: list) -> list:
+        import re
+        ajax_url = re.search('ajax\(\{url: \"([^"]*)\"', page).group(1)
+        headers = {
+            'x-requested-with': 'XMLHttpRequest',
+            'Referer': url
+        }
+        for source in sources:
+            iframe = self.requests.get(
+                ajax_url + "?action=switch&index=%s&id=%s" % (source['url']['i'], source['url']['id']),
+                headers=headers).text
+            source['url'] = re.search('src="([^"]+)"', iframe).group(1)
+        return sources
