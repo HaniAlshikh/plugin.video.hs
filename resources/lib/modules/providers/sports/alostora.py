@@ -20,27 +20,27 @@ class Alostora(SportsProvider):
     def get_games_list(self) -> list:
         def construct_title(game_div):
             return self._generate_title(
-                game_div.find('div', class_='team-first').find('div', {'class': re.compile(".*team_title")}).get_text(),
-                game_div.find('div', class_='team-second').find('div', {'class': re.compile(".*team_title")}).get_text(),
-                game_div.find('div', {'class': 'matchTime'}).get_text()
+                game_div.find('div', class_='AF_FTeam').find('div', class_='AF_TeamName').get_text(),
+                game_div.find('div', class_='AF_STeam').find('div', class_='AF_TeamName').get_text(),
+                game_div.find('div', class_='AF_EvTime').get_text()
             )
 
         def construct_poster(game_div):
             return self._generate_game_art(
-                game_div.find('div', class_='team-first').find('img').get('src'),
-                game_div.find('div', class_='team-first').find('div', {'class': re.compile(".*team_title")}).get_text(),
-                game_div.find('div', class_='team-second').find('img').get('src'),
-                game_div.find('div', class_='team-second').find('div', {'class': re.compile(".*team_title")}).get_text(),
+                game_div.find('div', class_='AF_FTeam').find('img').get('src'),
+                game_div.find('div', class_='AF_FTeam').find('div', class_='AF_TeamName').get_text(),
+                game_div.find('div', class_='AF_STeam').find('img').get('src'),
+                game_div.find('div', class_='AF_STeam').find('div', class_='AF_TeamName').get_text(),
                 banner=True
             )
 
         def construct_overview(game_div):
-            info = game_div.find(class_='events-info')
+            info = game_div.find(class_='AF_EvInfo')
             return self._generate_overview(
                 info.select_one('span.mic').get_text(),
                 info.select_one('span.tv').get_text(),
                 info.select_one('span.cup').get_text(),
-                '-'.join(map(lambda r: r.get_text(), game_div.find(class_='matchResult').find_all(class_='result')))
+                '-'.join(map(lambda r: r.get_text(), game_div.find(class_='AF_EventResult').find_all(class_='result')))
             )
 
         page = self.requests.get().text
