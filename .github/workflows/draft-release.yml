@@ -2,10 +2,10 @@ name: Draft Release
 
 on:
   push:
-    branches: [ main, development ]
+    branches: [ main ]
     tags: [ '!*' ]
   pull_request:
-    branches: [ main, development ]
+    branches: [ main ]
 
 jobs:
   draft-release:
