@@ -137,7 +137,7 @@ class ListBuilder(object):
 
         list_items = []
         smart_play = params.pop("smart_play", False)
-        no_paging = params.pop("no_paging", False)
+        no_paging = params.pop("no_paging", len(trakt_list) <= g.get_int_setting("item.limit", 0))
         sort = params.pop("sort", False)
         prepend_date = params.pop("prepend_date", False)
         mixed_list = params.pop("mixed_list", False)

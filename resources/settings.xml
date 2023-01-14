@@ -5,6 +5,11 @@
     <category label="الرئيسية">
 		<setting type="lsep" label="عام" />
 		<setting id="general.customLinks" type="text" label="مصدر الروابط الاضافة" default=""/>
+		<setting id="general.magicHD" type="text" label="رابط ماجيك HD" default=""/>
+
+        <!-- Advanced -->
+        <setting type="lsep" label="30282"/>
+        <setting id="item.limit" type="slider" label="30098" option="int" range="10,100" default="20"/>
 	</category>
 
     <!-- Accounts -->
@@ -31,7 +36,6 @@
         <setting id="rd.autodelete" type="bool" subsetting="true" label="30167" default="true" visible="eq(-7,true)"/>
         <setting id="rd.cloudInspection" type="bool" subsetting="true" label="30208" default="true"
                  visible="eq(-8,true)"/>
-
     </category>
 
 </settings>

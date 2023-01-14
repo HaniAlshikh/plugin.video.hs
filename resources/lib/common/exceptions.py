@@ -164,6 +164,10 @@ class RanOnceAlready(RuntimeError):
     pass
 
 
+class RunNotNeeded(RuntimeError):
+    pass
+
+
 from contextlib import suppress
 
 def try_and_log(source=''):

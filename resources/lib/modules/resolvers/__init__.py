@@ -190,36 +190,37 @@ class Resolver:
 
     @staticmethod
     def _test_direct_url(source):
-        try:
-            ext = source["url"].split("?")[0]
-            ext = ext.split("&")[0]
-            ext = ext.split("|")[0]
-            ext = ext.rsplit(".")[-1]
-            ext = ext.replace("/", "").lower()
-            if ext == "rar":
-                raise TypeError("Incorrect file format - rar file provided")
-
-            try:
-                headers = source["url"].rsplit("|", 1)[1]
-            except IndexError:
-                headers = ""
-
-            headers = tools.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
-            headers = dict(tools.parse_qsl(headers))
-
-            live_check = requests.head(source["url"], headers=headers, timeout=10)
-
-            if not live_check.status_code == 200:
-                g.log("Head Request failed link likely dead, skipping")
-                return
-
-            stream_link = source["url"]
-        except IndexError:
-            stream_link = None
-        except KeyError:
-            stream_link = None
-
-        return stream_link
+        return source["url"]
+        # try:
+        #     ext = source["url"].split("?")[0]
+        #     ext = ext.split("&")[0]
+        #     ext = ext.split("|")[0]
+        #     ext = ext.rsplit(".")[-1]
+        #     ext = ext.replace("/", "").lower()
+        #     if ext == "rar":
+        #         raise TypeError("Incorrect file format - rar file provided")
+        #
+        #     try:
+        #         headers = source["url"].rsplit("|", 1)[1]
+        #     except IndexError:
+        #         headers = ""
+        #
+        #     headers = tools.quote_plus(headers).replace("%3D", "=") if " " in headers else headers
+        #     headers = dict(tools.parse_qsl(headers))
+        #
+        #     live_check = requests.head(source["url"], headers=headers, timeout=10)
+        #
+        #     if not live_check.status_code == 200:
+        #         g.log("Head Request failed link likely dead, skipping")
+        #         return
+        #
+        #     stream_link = source["url"]
+        # except IndexError:
+        #     stream_link = None
+        # except KeyError:
+        #     stream_link = None
+        #
+        # return stream_link
 
     @staticmethod
     def _resolve_debrid_source(api, source, item_information, pack_select = False):

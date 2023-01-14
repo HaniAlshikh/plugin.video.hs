@@ -257,22 +257,30 @@ listitem_properties = [
 class GlobalVariables(object):
     CONTENT_FOLDER = "files"
     CONTENT_MOVIE = "movies"
+    CONTENT_SHOW_GENRE = "show_genres"
     CONTENT_SHOW = "tvshows"
     CONTENT_SEASON = "seasons"
     CONTENT_EPISODE = "episodes"
-    CONTENT_GENRES = "genres"
+    CONTENT_GENRE = "genres"
     CONTENT_YEARS = "years"
+    CONTENT_CHANNEL_GROUP = "channel_groups"
+    CONTENT_CHANNEL = "channels"
     MEDIA_FOLDER = "file"
     MEDIA_MOVIE = "movie"
     MEDIA_SHOW = "tvshow"
     MEDIA_SEASON = "season"
     MEDIA_EPISODE = "episode"
+    MEDIA_CHANNEL = "channel"
 
     DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
     DATE_FORMAT = "%Y-%m-%d"
 
+    PYTHON3 = tools.PYTHON3
+    UNICODE = tools.unicode
     SEMVER_REGEX = re.compile(r"^((?:\d+\.){2}\d+)")
+
+    M3U_SYNC_INTERVAL = 2  # days
 
     def __init__(self):
         self.IS_ADDON_FIRSTRUN = None
@@ -528,6 +536,7 @@ class GlobalVariables(object):
         )
         self.IMAGES_PATH = self.ADDON.getAddonInfo("path") + "/resources/images/"
         self.GENRES_PATH = self.IMAGES_PATH + "genres/"
+        self.M3U_FILES_PATH = self.ADDON_USERDATA_PATH
         self.SKINS_PATH = tools.translate_path(
             os.path.join(self.ADDON_USERDATA_PATH, "skins")
         )
@@ -683,6 +692,7 @@ class GlobalVariables(object):
         :rtype: bool
         """
         return self.RUNTIME_SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
+
     # endregion
 
     # region KODI setting
@@ -761,6 +771,7 @@ class GlobalVariables(object):
         :rtype: bool
         """
         return self.SETTINGS_CACHE.get_bool_setting(setting_id, default_value)
+
     # endregion
 
     def get_language_string(self, localization_id, addon=True):
@@ -998,6 +1009,9 @@ class GlobalVariables(object):
         self.close_all_dialogs()
         xbmc.executebuiltin('PlayMedia({})'.format(path))
 
+    def execute(self, path: str):
+        xbmc.executebuiltin(path)
+
     def premium_check(self):
         if self.PLAYLIST.getposition() <= 0 and not self.debrid_available():
             return False
@@ -1192,13 +1206,13 @@ class GlobalVariables(object):
         if art is None or not isinstance(art, dict):
             art = {}
         if (
-            art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
-            is None
+                art.get("fanart", art.get("season.fanart", art.get("tvshow.fanart", None)))
+                is None
         ) and not self.get_bool_setting("general.fanart.fallback", False):
             art["fanart"] = self.DEFAULT_FANART
         if (
-            art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
-            is None
+                art.get("poster", art.get("season.poster", art.get("tvshow.poster", None)))
+                is None
         ):
             art["poster"] = self.DEFAULT_ICON
         if art.get("icon") is None:
@@ -1214,8 +1228,8 @@ class GlobalVariables(object):
         self.clean_info_keys(info)
         # Only TV shows/seasons/episodes have associated times, movies just have dates.
         # if media_type in [g.MEDIA_SHOW, g.MEDIA_SEASON, g.MEDIA_EPISODE]:
-            # Convert dates to localtime for display
-            # self.convert_info_dates(info)
+        # Convert dates to localtime for display
+        # self.convert_info_dates(info)
 
         item.setInfo("video", info)
 
@@ -1310,6 +1324,30 @@ class GlobalVariables(object):
         dialogue = xbmcgui.Dialog()
         dialogue.notification(heading, message, time=time, sound=sound)
         del dialogue
+
+    def progress_notification(self, heading: str, message: str = "", silent=False):
+        class DialogProgressBGSilent:
+            def __init__(self) -> None:
+                pass
+
+            def deallocating(self) -> None:
+                pass
+
+            def create(self, heading: str, message: str = "") -> None:
+                pass
+
+            def update(self, percent: int = 0, heading: str = "", message: str = "") -> None:
+                pass
+
+            def close(self):
+                pass
+
+            def isFinished(self):
+                pass
+
+        dialog = xbmcgui.DialogProgressBG() if not silent else DialogProgressBGSilent()
+        dialog.create(heading, message)
+        return dialog
 
     def ok_dialog(self, message, heading=''):
         heading = heading if heading else self.ADDON_NAME

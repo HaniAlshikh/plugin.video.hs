@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.gui.providers.media.arabseed_menu import ArabseedMenu
+from resources.lib.gui.providers.media.magichd_menu import MagicHDMenu
 from resources.lib.gui.providers.sports.alostora_menu import AlostoraMenu
 from resources.lib.gui.providers.sports.asgoal_menu import AsgoalMenu
 from resources.lib.gui.providers.media.cimanow_menu import CimanowMenu
@@ -20,12 +21,13 @@ class ProviderMenus:
         self.providers_media = {
             'arabseed': ArabseedMenu(),
             'shahed4u': Shahed4uMenu(),
-            'cimanow': CimanowMenu()
+            'cimanow': CimanowMenu(),
+            'magichd': MagicHDMenu(),
         }
         self.providers_sports = {
             'alostora': AlostoraMenu(),
             'asgoal': AsgoalMenu(),
-            'yallalive': YallaliveMenu()
+            'yallalive': YallaliveMenu(),
         }
 
         self.PROVIDERS = {**self.providers_media, **self.providers_sports}
@@ -67,6 +69,12 @@ class ProviderMenus:
             action="shows",
             action_args={"provider": provider},
             description='قائمة المسلسلات',
+        )
+        g.add_directory_item(
+            "قنوات",
+            action="channels",
+            action_args={"provider": provider},
+            description='قائمة القنوات',
         )
         g.add_directory_item(
             "بحث",

@@ -7,9 +7,9 @@ class HomeMenus:
 
     @staticmethod
     def home():
-        g.add_directory_item('افلام ومسلسلات',
+        g.add_directory_item('افلام، مسلسلات، وقنوات',
                              action='mediaProvidersHome',
-                             description='قائمة المواقع المدعومة لمشاهدة احدث الافلام والمسلسلات العربية')
+                             description='قائمة المواقع المدعومة لمشاهدة احدث الافلام، المسلسلات، والقنوات العربية')
         g.add_directory_item('رياضة',
                              action='sportsProvidersHome',
                              description='قائمة المواقع المدعومة لمشاهدة اخر الاحداث الرياضية')
@@ -20,9 +20,9 @@ class HomeMenus:
         g.add_directory_item(g.get_language_string(30013),
                              action='searchMenu',
                              description=g.get_language_string(30397))
-        # g.add_directory_item(g.get_language_string(30027),
-        #                      action='toolsMenu',
-        #                      description=g.get_language_string(30398))
+        g.add_directory_item(g.get_language_string(30027),
+                             action='toolsMenu',
+                             description=g.get_language_string(30398))
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod
@@ -45,45 +45,9 @@ class HomeMenus:
 
     @staticmethod
     def tools_menu():
-        g.add_directory_item(g.get_language_string(30037),
+        g.add_directory_item('ادوات موفري المصادر',
                              action='providerTools',
                              description=g.get_language_string(30405))
-        if g.debrid_available():
-            g.add_directory_item(g.get_language_string(30038),
-                                 action='debridServices',
-                                 description=g.get_language_string(30406))
-        g.add_directory_item(g.get_language_string(30028),
-                             action='clearCache',
-                             is_folder=False,
-                             description=g.get_language_string(30407))
-        g.add_directory_item(g.get_language_string(30039),
-                             action='clearTorrentCache',
-                             is_folder=False,
-                             description=g.get_language_string(30408))
-        g.add_directory_item(g.get_language_string(30199),
-                             action='clearSearchHistory',
-                             is_folder=False,
-                             description=g.get_language_string(30409))
-        g.add_directory_item(g.get_language_string(30040),
-                             action='openSettings',
-                             is_folder=False,
-                             description=g.get_language_string(30410))
-        g.add_directory_item(g.get_language_string(30041),
-                             action='cleanInstall',
-                             is_folder=False,
-                             description=g.get_language_string(30411))
-        g.add_directory_item(g.get_language_string(30234),
-                             action='traktSyncTools',
-                             is_folder=True,
-                             description=g.get_language_string(30412))
-        g.add_directory_item('Download Manager',
-                             action='downloadManagerView',
-                             is_folder=False,
-                             description='View Current Downloads')
-        if g.get_bool_setting("skin.testmenu", False):
-            g.add_directory_item('Window Tests',
-                                 action='testWindows',
-                                 description=g.get_language_string(30413))
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod
@@ -92,10 +56,6 @@ class HomeMenus:
                              action='manualProviderUpdate',
                              is_folder=False,
                              description=g.get_language_string(30414))
-        g.add_directory_item(g.get_language_string(30150),
-                             action='manageProviders',
-                             is_folder=False,
-                             description=g.get_language_string(30415))
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod
