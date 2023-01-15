@@ -93,10 +93,11 @@ class MediaMenu(ProviderMenu):
 
     def search(self, query: str, mediatype: str):
         search_list = self.get_search_results(query, mediatype)
-        if mediatype == g.MEDIA_MOVIE:
+        if mediatype == g.MEDIA_MOVIE or g.MEDIA_CHANNEL:
             self.list_builder.movie_menu_builder(search_list)
         elif mediatype == g.MEDIA_SHOW:
             self.list_builder.show_list_builder(search_list)
 
     def get_search_results(self, query: str, mediatype: str):
+        g.log('searching {}-{} for {}'.format(self.api.name, mediatype, query))
         return self.api.search(query, mediatype)

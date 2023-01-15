@@ -90,7 +90,7 @@ class MetadataHandler:
                 item['info']['overview'] = item['info']['plot']
 
         if item.get('url'):
-            item['url'] = item['url'].strip()
+            item['url'] = str(item['url']).strip()
 
         if item.get('art'):
             if item['art'].get('poster'):
@@ -129,4 +129,4 @@ class MetadataHandler:
             item['info'] = get_info(item['release_title'])
 
         if item.get('url'):
-            item['url'] = item['url'].strip()
+            item['url'] = str(item['url']).strip()

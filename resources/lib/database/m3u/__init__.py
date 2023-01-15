@@ -40,7 +40,7 @@ schema = {
             [
                 ("id", ["INTEGER", "PRIMARY KEY", "NOT NULL"]),
                 ("show_genre_id", ["INTEGER", "NOT NULL"]),
-                ("tvshowtitle", ["TEXT", "NOT NULL"]),
+                ("title", ["TEXT", "NOT NULL"]),
                 ("info", ["PICKLE", "NULL"]),
                 ("art", ["PICKLE", "NULL"]),
                 ("args", ["TEXT", "NOT NULL"]),
@@ -49,7 +49,7 @@ schema = {
             ]
         ),
         "table_constraints": [
-            "UNIQUE(tvshowtitle)",
+            "UNIQUE(title)",
             "FOREIGN KEY(show_genre_id) REFERENCES " + g.CONTENT_SHOW_GENRE + "(id) DEFERRABLE INITIALLY DEFERRED",
         ],
         "default_seed": [],
@@ -114,6 +114,7 @@ schema = {
             [
                 ("id", ["INTEGER", "PRIMARY KEY", "NOT NULL"]),
                 ("genre_id", ["INTEGER", "NOT NULL"]),
+                ("title", ["TEXT", "NOT NULL"]),
                 ("info", ["PICKLE", "NULL"]),
                 ("art", ["PICKLE", "NULL"]),
                 ("args", ["TEXT", "NOT NULL"]),
@@ -143,6 +144,7 @@ schema = {
             [
                 ("id", ["INTEGER", "PRIMARY KEY", "NOT NULL"]),
                 ("channel_group_id", ["INTEGER", "NOT NULL"]),
+                ("title", ["TEXT", "NOT NULL"]),
                 ("info", ["PICKLE", "NULL"]),
                 ("art", ["PICKLE", "NULL"]),
                 ("args", ["TEXT", "NOT NULL"]),
@@ -214,7 +216,7 @@ class M3UDatabase(Database):
             (
                 media_id,
                 show_genre_id,
-                get(media, "tvshowtitle"),
+                get(media, "title"),
                 get(media, "info"),
                 get(media, "art"),
                 get(media, "args"),
@@ -277,6 +279,7 @@ class M3UDatabase(Database):
             self.upsert_movie_query,
             (
                 genre_id,
+                get(media, "title"),
                 get(media, "info"),
                 get(media, "art"),
                 get(media, "args"),
@@ -304,6 +307,7 @@ class M3UDatabase(Database):
             self.upsert_channel_query,
             (
                 channel_group_id,
+                get(media, "title"),
                 get(media, "info"),
                 get(media, "art"),
                 get(media, "args"),
@@ -345,6 +349,11 @@ class M3UDatabase(Database):
             "SELECT * FROM {} WHERE channel_group_id={}".format(g.CONTENT_CHANNEL, channel_group_id)
         )
 
+    def search(self, search_query, content_type):
+        return self.get_list(
+            "SELECT * FROM {} WHERE title LIKE '%{}%'".format(content_type, search_query)
+        )
+
     @property
     def upsert_show_genre_query(self):
         return """
@@ -355,7 +364,7 @@ class M3UDatabase(Database):
     @property
     def upsert_show_query(self):
         return """
-            INSERT into {}(id, show_genre_id, tvshowtitle, info, art, args, url, provider) 
+            INSERT into {}(id, show_genre_id, title, info, art, args, url, provider) 
             VALUES (?,?,?,?,?,?,?,?)
             """.format(g.CONTENT_SHOW)
 
@@ -383,8 +392,8 @@ class M3UDatabase(Database):
     @property
     def upsert_movie_query(self):
         return """
-            INSERT into {}(genre_id, info, art, args, url, provider) 
-            VALUES (?,?,?,?,?,?)
+            INSERT into {}(genre_id, title, info, art, args, url, provider) 
+            VALUES (?,?,?,?,?,?,?)
             """.format(g.CONTENT_MOVIE)
 
     @property
@@ -397,11 +406,11 @@ class M3UDatabase(Database):
     @property
     def upsert_channel_query(self):
         return """
-            INSERT into {}(channel_group_id, info, art, args, url, provider) 
-            VALUES (?,?,?,?,?,?)
+            INSERT into {}(channel_group_id, title, info, art, args, url, provider) 
+            VALUES (?,?,?,?,?,?,?)
             """.format(g.CONTENT_CHANNEL)
 
     def _insert_media(self, media, query, data):
         if not media:
-            return None
+            return -1
         return self.execute_sql(query, data).lastrowid

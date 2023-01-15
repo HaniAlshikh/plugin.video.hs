@@ -41,6 +41,8 @@ class Shahed4u(MediaProvider):
         return self._get_posts(page, g.MEDIA_EPISODE)
 
     def search(self, query: str, mediatype: str) -> list:
+        if mediatype == g.MEDIA_CHANNEL:
+            return []
         type_ = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
         page = self._get_paginated_page('?s={}&type={}'.format(query, type_))
         return self._get_posts(page, mediatype)

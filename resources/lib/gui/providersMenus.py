@@ -87,7 +87,7 @@ class ProviderMenus:
     def search(self, query=None, mediatype=None, provider=None):
         if provider:
             if not mediatype:
-                mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW}
+                mediatypes = {'فلم': g.MEDIA_MOVIE, 'مسلسل': g.MEDIA_SHOW, 'قناة': g.MEDIA_CHANNEL}
                 mediatype = g.get_option_input('بحث عن', mediatypes)
                 if not mediatype:
                     return
@@ -104,17 +104,21 @@ class ProviderMenus:
         # if g.get_bool_setting("searchHistory"):
         #     SearchHistory().add_search_history("movie", query)
 
+        g.show_busy_dialog()
         self.search_results(mediatype, query)
+        g.close_busy_dialog()
 
     def search_results(self, mediatype, query):
         results = []
         for p in self.providers_media.values():
-            g.log('searching {}|{} for {}'.format(p.api.name, mediatype, query))
-            provider_results = p.get_search_results(query, mediatype)
-            for r in provider_results:
-                r['info']['title'] = p.api.name.upper() + ': ' + r['info']['title']
+            try:
+                provider_results = p.get_search_results(query, mediatype)
+                for r in provider_results:
+                    r['info']['title'] = p.api.name.upper() + ': ' + r['info']['title']
 
-            results.extend(provider_results)
+                results.extend(provider_results)
+            except:
+                g.log('failed searching {}|{} for {}'.format(p.api.name, mediatype, query))
 
         if not results:
             g.cancel_directory()

@@ -42,9 +42,8 @@ class MagicHD(MediaProvider):
         return self.db.get_channels(category)
 
     def search(self, query: str, mediatype: str) -> list:
-        type_ = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
-        page = self._get_paginated_page('?s={}&type={}'.format(query, type_))
-        return self._get_posts(page, mediatype)
+        # TODO: auramod onscreen keyboard by Cartmandos (Titan Bingie) arabic fix
+        return self.db.search(query, mediatype+"s")
 
     def get_sources(self, url: str) -> list:
         return [

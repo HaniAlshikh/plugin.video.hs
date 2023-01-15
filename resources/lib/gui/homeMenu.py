@@ -41,6 +41,9 @@ class HomeMenus:
         g.add_directory_item(g.get_language_string(30026),
                              action='searchShowsGlobally',
                              description=g.get_language_string(30400))
+        g.add_directory_item("البحث في القنوات...",
+                             action='searchChannelsGlobally',
+                             description='ابحث عن القنوات بالعنوان')
         g.close_directory(g.CONTENT_FOLDER)
 
     @staticmethod

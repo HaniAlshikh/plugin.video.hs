@@ -123,13 +123,13 @@ def dispatch(params):
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(provider=action_args['provider'])
 
-    elif action == "searchMovies" or action == "searchShows":
-        mediatype = g.MEDIA_MOVIE if action == "searchMovies" else g.MEDIA_SHOW
+    elif action == "searchMovies" or action == "searchShows" or action == "searchChannels":
+        mediatype = g.MEDIA_MOVIE if action == "searchMovies" else g.MEDIA_SHOW if action == "searchShows" else g.MEDIA_CHANNEL
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(fix_arabic(params.get('query')), mediatype, params.get('provider'))
 
-    elif action == "searchMoviesGlobally" or action == "searchShowsGlobally":
-        mediatype = g.MEDIA_MOVIE if action == "searchMoviesGlobally" else g.MEDIA_SHOW
+    elif action == "searchMoviesGlobally" or action == "searchShowsGlobally" or action == "searchChannelsGlobally":
+        mediatype = g.MEDIA_MOVIE if action == "searchMoviesGlobally" else g.MEDIA_SHOW if action == "searchShowsGlobally" else g.MEDIA_CHANNEL
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(mediatype=mediatype)
 
