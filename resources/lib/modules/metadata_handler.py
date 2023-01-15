@@ -17,6 +17,10 @@ class MetadataHandler:
         if params.get('overview'): media['info']['overview'] = params.get('overview')
         if params.get('last_watched_at'): media['info']['last_watched_at'] = params.get('last_watched_at')
         if params.get('mediatype'): media['info']['mediatype'] = params.get('mediatype')
+        if params.get('category'): media['info']['category'] = params.get('category')
+        if params.get('tvshowtitle'): media['info']['tvshowtitle'] = params.get('tvshowtitle')
+        if params.get('season'): media['info']['season'] = params.get('season')
+        if params.get('episode'): media['info']['episode'] = params.get('episode')
 
         if params.get('poster'): media['art']['poster'] = params.get('poster')
 
@@ -25,6 +29,28 @@ class MetadataHandler:
 
         media['args'] = g.create_args(media)
         return media
+
+    @staticmethod
+    def get_media(media, id):
+        if id == 'info': return media['info']
+        if id == 'title': return media['info']['title']
+        if id == 'overview': return media['info']['overview']
+        if id == 'last_watched_at': return media['info']['last_watched_at']
+        if id == 'mediatype': return media['info']['mediatype']
+        if id == 'category': return media['info']['category']
+        if id == 'tvshowtitle': return media['info']['tvshowtitle']
+        if id == 'season': return media['info']['season']
+        if id == 'episode': return media['info']['episode']
+
+        if id == 'art': return media['art']
+        if id == 'poster': return media['art']['poster']
+
+        if id == 'url': return media['url']
+        if id == 'provider': return media['provider']
+
+        if id == 'args': return media['args']
+
+        return None
 
     @staticmethod
     def source(**params):
@@ -45,6 +71,14 @@ class MetadataHandler:
         if item.get('info'):
             if item['info'].get('title'):
                 item['info']['title'] = clean_up_string(item['info']['title'])
+                try:
+                    num = int(item['info']['title'])
+                    if item['info'].get("mediatype", "") == g.MEDIA_SEASON:
+                        item['info']['title'] = "{} {}".format('موسم', num)
+                    else:
+                        item['info']['title'] = "{} {}".format('حلقة', num)
+                except:
+                    pass
 
             if item['info'].get('overview') and not item['info'].get('plot'):
                 item['info']['plot'] = item['info']['overview']
@@ -56,7 +90,7 @@ class MetadataHandler:
                 item['info']['overview'] = item['info']['plot']
 
         if item.get('url'):
-            item['url'] = item['url'].strip()
+            item['url'] = str(item['url']).strip()
 
         if item.get('art'):
             if item['art'].get('poster'):
@@ -95,4 +129,4 @@ class MetadataHandler:
             item['info'] = get_info(item['release_title'])
 
         if item.get('url'):
-            item['url'] = item['url'].strip()
+            item['url'] = str(item['url']).strip()

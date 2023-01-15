@@ -37,11 +37,20 @@ class MediaProvider(Provider):
     def get_season_episodes(self, url: str) -> list:
         return []
 
+    def get_channels_categories(self) -> list:
+        return []
+
+    def get_channels_list(self, category: str) -> list:
+        return []
+
     def search(self, query, mediatype: str) -> list:
         return []
 
     def get_sources(self, url: str) -> list:
         return []
+
+    def sync(self):
+        return
 
     def _get_posts(self, page: str, mediatype: str) -> list:
         return []

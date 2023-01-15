@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import collections
 import copy
@@ -100,7 +101,7 @@ def copy2clip(txt):
             log("Failure to copy to clipboard, \n{}".format(e), "error")
 
 
-def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True):
+def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True) -> datetime.datetime | datetime.date:
     """
     Attempts to pass over provided string and return a date or datetime object
     :param string_date: String to parse
@@ -610,3 +611,31 @@ def get_current_datetime_for_time(t: str, datetime_format, time_format='%I:%M %p
 
 def get_any(dic: dict, *keys):
     return dic.get(next((k for k in keys if dic.get(k)), None))
+
+def get_supported_media(media):
+    if media == "video":
+        return (
+            '.m4v', '.3g2', '.3gp', '.nsv', '.tp', '.ts', '.ty', '.strm', '.pls', '.rm', '.rmvb', '.mpd', '.m3u',
+            '.m3u8',
+            '.ifo', '.mov', '.qt', '.divx', '.xvid', '.bivx', '.vob', '.nrg', '.img', '.iso', '.pva', '.wmv', '.asf',
+            '.asx', '.ogm', '.m2v', '.avi', '.bin', '.dat', '.mpg', '.mpeg', '.mp4', '.mkv', '.mk3d', '.avc', '.vp3',
+            '.svq3', '.nuv', '.viv', '.dv', '.fli', '.flv', '.rar', '.001', '.wpl', '.zip', '.vdr', '.dvr-ms', '.xsp',
+            '.mts', '.m2t', '.m2ts', '.evo', '.ogv', '.sdp', '.avs', '.rec', '.url', '.pxml', '.vc1', '.h264', '.rcv',
+            '.rss', '.mpls', '.webm', '.bdmv', '.wtv', '.pvr', '.disc'
+        )
+
+    elif media == "music":
+        return (
+        '.nsv', '.m4a', '.flac', '.aac', '.strm', '.pls', '.rm', '.rma', '.mpa', '.wav', '.wma', '.ogg', '.mp3', '.mp2',
+        '.m3u', '.gdm', '.imf', '.m15', '.sfx', '.uni', '.ac3', '.dts', '.cue', '.aif', '.aiff', '.wpl', '.ape', '.mac',
+        '.mpc', '.mp+', '.mpp', '.shn', '.zip', '.rar', '.wv', '.dsp', '.xsp', '.xwav', '.waa', '.wvs', '.wam', '.gcm',
+        '.idsp', '.mpdsp', '.mss', '.spt', '.rsd', '.sap', '.cmc', '.cmr', '.dmc', '.mpt', '.mpd', '.rmt', '.tmc',
+        '.tm8', '.tm2', '.oga', '.url', '.pxml', '.tta', '.rss', '.wtv', '.mka', '.tak', '.opus', '.dff', '.dsf',
+        '.cdda'
+        )
+    elif media == "picture":
+        return (
+        '.png', '.jpg', '.jpeg', '.bmp', '.gif', '.ico', '.tif', '.tiff', '.tga', '.pcx', '.cbz', '.zip', '.cbr',
+        '.rar', '.rss', '.webp', '.jp2', '.apng'
+        )
+    return ""

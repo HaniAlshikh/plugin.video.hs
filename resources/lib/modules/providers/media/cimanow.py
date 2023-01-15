@@ -55,7 +55,6 @@ class Cimanow(MediaProvider):
         )
 
     def search(self, query: str, mediatype: str):
-        # type = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
         page = self._get_paginated_page('?s={}'.format(query))
         return self._get_posts(page, mediatype)
 

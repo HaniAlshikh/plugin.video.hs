@@ -5,6 +5,7 @@ import os
 
 from bs4 import BeautifulSoup
 
+from resources.lib.database import Database
 from resources.lib.modules.globals import g
 from resources.lib.modules.metadata_handler import MetadataHandler
 from resources.lib.modules.providers.provider_utils import get_quality
@@ -17,6 +18,11 @@ class Provider:
         self.name = name
         self.urls = urls
         self.requests = Request(self.urls[0])
+
+        self.support_channels = False
+
+        self.notification_header = g.ADDON_NAME + ": " + self.display_name
+        self.progress_dialog = g.progress_notification(self.notification_header, "", silent=True)
 
     def _extract_categories_meta(self, page, categories_div, cat_title, cat_url):
         categories = []
@@ -98,6 +104,39 @@ class Provider:
             sources.append(source)
 
         return sources
+
+    def _extract_m3u_meta(self, media: dict, mediatype: str, **params) -> dict:
+        return MetadataHandler.media(
+            title=params.get('title') or media['name'],
+            mediatype=mediatype,
+            poster=params.get('poster') or media['logo'],
+            url=params.get('url') or media['url'],
+            provider=self.name,
+            overview=params.get('overview'),
+            category=params.get('category'),
+            tvshowtitle=params.get('tvshowtitle'),
+            episode=params.get('episode'),
+            season=params.get('season'),
+        )
+
+    def _get_source_meta(self, **params) -> list:
+        return MetadataHandler.source(
+            display_name=params.get('display_name'),
+            release_title=params.get('release_title'),
+            url=params.get('url'),
+            quality=params.get('quality'),
+            type=params.get('type'),
+            provider=params.get('provider'),
+            origin=self.name,
+        )
+
+    def _extract_m3u(self):
+        g.log("Downloading...")
+        self.progress_dialog.update(10, self.notification_header, "جاري تحميل ملف الروابط")
+        from resources.lib.third_part.m3u_parser import M3uParser
+        parser = M3uParser()
+        parser.parse_m3u(self.urls[0], check_live=False, enforce_schema=True)
+        return parser
 
     @staticmethod
     def _generate_game_art(

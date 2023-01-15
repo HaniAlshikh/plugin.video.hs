@@ -9,7 +9,7 @@ from resources.lib.modules.helpers.player_helper import PlayerHelper
 def dispatch(params):
     # params = g.REQUEST_PARAMS
     action = params.get("action")
-    action_args = params.get("action_args")
+    action_args = params.get("action_args") or {}
     link = params.get('link')
     pack_select = params.get("packSelect")
     source_select = params.get("source_select") == "true"
@@ -56,6 +56,14 @@ def dispatch(params):
         from resources.lib.gui.homeMenu import HomeMenus
         HomeMenus().search_menu()
 
+    elif action == "toolsMenu":
+        from resources.lib.gui.homeMenu import HomeMenus
+        HomeMenus().tools_menu()
+
+    elif action == "providerTools":
+        from resources.lib.gui.homeMenu import HomeMenus
+        HomeMenus().provider_menu()
+
     ######################################################
     # PROVIDERS
     ######################################################
@@ -67,6 +75,10 @@ def dispatch(params):
     elif action == "shows":
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().PROVIDERS[action_args["provider"]].shows(category)
+
+    elif action == "channels":
+        from resources.lib.gui.providersMenus import ProviderMenus
+        ProviderMenus().PROVIDERS[action_args["provider"]].channels(category)
 
     elif action == "showSeasons":
         from resources.lib.gui.providersMenus import ProviderMenus
@@ -99,6 +111,10 @@ def dispatch(params):
 
         PlayerHelper.ensure_all_sources_were_tried(action_args)
 
+    elif action == "syncM3U":
+        from resources.lib.modules.providers.media.MagicHD import MagicHD
+        MagicHD().sync(force=action_args.get('force'))
+
     ######################################################
     # SEARCH
     ######################################################
@@ -107,15 +123,22 @@ def dispatch(params):
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(provider=action_args['provider'])
 
-    elif action == "searchMovies" or action == "searchShows":
-        mediatype = g.MEDIA_MOVIE if action == "searchMovies" else g.MEDIA_SHOW
+    elif action == "searchMovies" or action == "searchShows" or action == "searchChannels":
+        mediatype = g.MEDIA_MOVIE if action == "searchMovies" else g.MEDIA_SHOW if action == "searchShows" else g.MEDIA_CHANNEL
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(fix_arabic(params.get('query')), mediatype, params.get('provider'))
 
-    elif action == "searchMoviesGlobally" or action == "searchShowsGlobally":
-        mediatype = g.MEDIA_MOVIE if action == "searchMoviesGlobally" else g.MEDIA_SHOW
+    elif action == "searchMoviesGlobally" or action == "searchShowsGlobally" or action == "searchChannelsGlobally":
+        mediatype = g.MEDIA_MOVIE if action == "searchMoviesGlobally" else g.MEDIA_SHOW if action == "searchShowsGlobally" else g.MEDIA_CHANNEL
         from resources.lib.gui.providersMenus import ProviderMenus
         ProviderMenus().search(mediatype=mediatype)
+
+    ######################################################
+    # TOOLS
+    ######################################################
+
+    elif action == "manualProviderUpdate":
+        g.execute('RunPlugin("plugin://plugin.video.hs/?action=syncM3U&action_args={}")'.format(g.create_args({'force': True})))
 
     ######################################################
     # SERVICES
@@ -123,5 +146,4 @@ def dispatch(params):
 
     elif action == "authRealDebrid":
         from resources.lib.debrid import real_debrid
-
         real_debrid.RealDebrid().auth()

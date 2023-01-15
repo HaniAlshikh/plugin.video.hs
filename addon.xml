@@ -5,10 +5,12 @@
 		<import addon="script.module.requests" version="2.22.0" optional="false"/>
 		<import addon="script.module.beautifulsoup4" version="4.9.3" optional="false"/>
 		<import addon="script.module.pil" version="5.1.0" optional="true"/>
+		<import addon="script.module.myconnpy" version="1.1.7"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="hs.py">
 		<provides>video</provides>
 	</extension>
+	<extension point="xbmc.service" library="service.py"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en">H-S Videos - Arabic videos at your finger tips</summary>
 		<description lang="en">Watch from a huge selection of Arabic Videos reliably and ad-free...
