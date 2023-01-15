@@ -14,6 +14,7 @@ class MagicHD(MediaProvider):
             "magichd",
             [g.get_setting('general.magicHD')],
         )
+        self.support_channels = True
         self.db = M3UDatabase(self)
 
     def get_movies_categories(self) -> list:

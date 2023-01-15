@@ -99,5 +99,7 @@ class MediaMenu(ProviderMenu):
             self.list_builder.show_list_builder(search_list)
 
     def get_search_results(self, query: str, mediatype: str):
+        if not self.api.support_channels:
+            return []
         g.log('searching {}-{} for {}'.format(self.api.name, mediatype, query))
         return self.api.search(query, mediatype)

@@ -33,8 +33,6 @@ class Arabseed(MediaProvider):
         )
 
     def search(self, query: str, mediatype: str):
-        if mediatype == g.MEDIA_CHANNEL:
-            return []
         type_ = 'series' if mediatype == g.MEDIA_SHOW else 'movie'
         page = self.requests.post(
             'wp-content/themes/Elshaikh2021/Ajaxat/SearchingTwo.php',

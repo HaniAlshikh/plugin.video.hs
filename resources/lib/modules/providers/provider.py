@@ -19,6 +19,8 @@ class Provider:
         self.urls = urls
         self.requests = Request(self.urls[0])
 
+        self.support_channels = False
+
         self.notification_header = g.ADDON_NAME + ": " + self.display_name
         self.progress_dialog = g.progress_notification(self.notification_header, "", silent=True)
 
