@@ -17,4 +17,4 @@ class SportsMenu(ProviderMenu):
 
     def _list_current_games(self):
         games_list = self.api.get_games_list()
-        self.list_builder.movie_menu_builder(games_list)
+        self.list_builder.sport_menu_builder(games_list)

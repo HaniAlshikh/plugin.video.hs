@@ -118,6 +118,20 @@ class ListBuilder(object):
             **params
         )
 
+    def sport_menu_builder(self, item_list, **params):
+        params["is_folder"] = False
+        params["is_playable"] = True
+        action = "getSources"
+
+        item_list = self._sort_sport_games(item_list)
+
+        self._common_menu_builder(
+            item_list,
+            g.CONTENT_MOVIE,
+            action,
+            **params
+        )
+
     def lists_menu_builder(self, trakt_list, **params):
         """
         Builds a menu list of lists
@@ -309,3 +323,16 @@ class ListBuilder(object):
             )
 
         return name
+
+    @staticmethod
+    def _sort_sport_games(games):
+        sorted_games = []
+        finished_games = []
+        for game in games:
+            if game['info'].get('last_watched_at'):
+                finished_games.append(game)
+            else:
+                sorted_games.append(game)
+        sorted_games.extend(finished_games)
+
+        return sorted_games

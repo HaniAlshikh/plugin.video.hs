@@ -51,7 +51,7 @@ class MagicHD(MediaProvider):
             self._get_source_meta(
                 display_name=self.display_name,
                 url=url,
-                quality="HD",
+                quality="livestream",
                 type="hoster",
                 provider=self.name,
             )

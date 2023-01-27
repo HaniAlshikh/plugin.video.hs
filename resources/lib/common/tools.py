@@ -101,7 +101,7 @@ def copy2clip(txt):
             log("Failure to copy to clipboard, \n{}".format(e), "error")
 
 
-def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True) -> datetime.datetime | datetime.date:
+def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True, time_only=False) -> datetime.datetime | datetime.date | datetime.time | None:
     """
     Attempts to pass over provided string and return a date or datetime object
     :param string_date: String to parse
@@ -110,6 +110,8 @@ def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True) -> dat
     :type format_string: str
     :param date_only: Whether to return a date only object or not
     :type date_only: bool
+    :param time_only: Whether to return a time only object or not
+    :type time_only: bool
     :return: datetime.datetime or datetime.date object
     :rtype: object
     """
@@ -120,13 +122,18 @@ def parse_datetime(string_date, format_string="%Y-%m-%d", date_only=True) -> dat
     # Workaround for python bug caching of strptime in datetime module.
     # Don't just try to detect TypeError because it breaks meta handler lambda calls occasionally, particularly
     # with unix style threading.
-    if date_only:
+    if time_only:
+        res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).time()
+    elif date_only:
         res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6])).date()
     else:
         res = datetime.datetime(*(time.strptime(string_date, format_string)[0:6]))
 
     return res
 
+def get_current_datetime_for_time(t: str, datetime_format, time_format='%I:%M %p'):
+    t = time.strptime(t.strip(), time_format)
+    return datetime.datetime.today().replace(hour=t.tm_hour, minute=t.tm_min).strftime(datetime_format)
 
 def shortened_debrid(debrid):
     """
@@ -602,11 +609,6 @@ def fix_arabic(string: str) -> str:
 
 def clean_up_string(string: str, sep: str = ' ') -> str:
     return sep.join(string.split())
-
-
-def get_current_datetime_for_time(t: str, datetime_format, time_format='%I:%M %p'):
-    t = time.strptime(t.strip(), time_format)
-    return datetime.datetime.today().replace(hour=t.tm_hour, minute=t.tm_min).strftime(datetime_format)
 
 
 def get_any(dic: dict, *keys):

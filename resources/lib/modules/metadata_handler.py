@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from resources.lib.common.tools import clean_up_string
+from datetime import datetime
+
+from resources.lib.common.tools import clean_up_string, parse_datetime
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.provider_utils import get_info, get_quality
 
@@ -21,6 +23,13 @@ class MetadataHandler:
         if params.get('tvshowtitle'): media['info']['tvshowtitle'] = params.get('tvshowtitle')
         if params.get('season'): media['info']['season'] = params.get('season')
         if params.get('episode'): media['info']['episode'] = params.get('episode')
+        if params.get('first_team'): media['info']['first_team'] = params.get('first_team')
+        if params.get('second_team'): media['info']['second_team'] = params.get('second_team')
+        if params.get('aired'): media['info']['aired'] = params.get('aired')
+        if params.get('channel'): media['info']['channel'] = params.get('channel')
+        if params.get('result'): media['info']['result'] = params.get('result')
+        if params.get('commentator'): media['info']['commentator'] = params.get('commentator')
+        if params.get('league'): media['info']['league'] = params.get('league')
 
         if params.get('poster'): media['art']['poster'] = params.get('poster')
 
@@ -32,23 +41,30 @@ class MetadataHandler:
 
     @staticmethod
     def get_media(media, id):
-        if id == 'info': return media['info']
-        if id == 'title': return media['info']['title']
-        if id == 'overview': return media['info']['overview']
-        if id == 'last_watched_at': return media['info']['last_watched_at']
-        if id == 'mediatype': return media['info']['mediatype']
-        if id == 'category': return media['info']['category']
-        if id == 'tvshowtitle': return media['info']['tvshowtitle']
-        if id == 'season': return media['info']['season']
-        if id == 'episode': return media['info']['episode']
+        if id == 'info': return media.get('info')
+        if id == 'title': return media.get('info', {}).get('title')
+        if id == 'overview': return media.get('info', {}).get('overview')
+        if id == 'last_watched_at': return media.get('info', {}).get('last_watched_at')
+        if id == 'mediatype': return media.get('info', {}).get('mediatype')
+        if id == 'category': return media.get('info', {}).get('category')
+        if id == 'tvshowtitle': return media.get('info', {}).get('tvshowtitle')
+        if id == 'season': return media.get('info', {}).get('season')
+        if id == 'episode': return media.get('info', {}).get('episode')
+        if id == 'first_team': return media.get('info', {}).get('first_team')
+        if id == 'second_team': return media.get('info', {}).get('second_team')
+        if id == 'aired': return media.get('info', {}).get('aired')
+        if id == 'channel': return media.get('info', {}).get('channel')
+        if id == 'result': return media.get('info', {}).get('result')
+        if id == 'commentator': return media.get('info', {}).get('commentator')
+        if id == 'league': return media.get('info', {}).get('league')
 
-        if id == 'art': return media['art']
-        if id == 'poster': return media['art']['poster']
+        if id == 'art': return media.get('art')
+        if id == 'poster': return media.get('art', {}).get('poster')
 
-        if id == 'url': return media['url']
-        if id == 'provider': return media['provider']
+        if id == 'url': return media.get('url')
+        if id == 'provider': return media.get('provider')
 
-        if id == 'args': return media['args']
+        if id == 'args': return media.get('args')
 
         return None
 
@@ -56,19 +72,49 @@ class MetadataHandler:
     def source(**params):
         source = {}
 
-        source['display_name'] = params.get('display_name')
-        source['release_title'] = params.get('release_title')
-        source['url'] = params.get('url')
-        source['quality'] = params.get('quality')
-        source['type'] = params.get('type')
-        source['provider'] = params.get('provider')
-        source['origin'] = params.get('origin')
+        if params.get('display_name'): source['display_name'] = params.pop('display_name')
+        if params.get('release_title'): source['release_title'] = params.pop('release_title')
+        if params.get('url'): source['url'] = params.pop('url')
+        if params.get('quality'): source['quality'] = params.pop('quality')
+        if params.get('type'): source['type'] = params.pop('type')
+        if params.get('provider'): source['provider'] = params.pop('provider')
+        if params.get('origin'): source['origin'] = params.pop('origin')
+        if params.get('channel'): source['channel'] = params.pop('channel')
 
         return source
 
     @staticmethod
     def improve_media(item):
         if item.get('info'):
+            if item['info'].get("mediatype", "") == g.MEDIA_SPORT:
+                item['info']['title'] = '{} ضد {} الساعة {} القناة {}'.format(
+                    item['info'].get('first_team', 'غير معروف'),
+                    item['info'].get('second_team', 'غير معروف'),
+                    str((parse_datetime(item['info'].get('aired'), g.DATE_TIME_FORMAT, time_only=True) or ''))[0:5],
+                    item['info'].get('channel', 'غير معروف'),
+                )
+
+                item['info']['overview'] = '''
+                النتيجة: {}
+                المعلق: {}
+                القناة: {}
+                الدوري: {}
+                '''.format(
+                    item['info'].get('result', '-'),
+                    item['info'].get('commentator', 'غير معروف'),
+                    item['info'].get('channel', 'غير معروف'),
+                    item['info'].get('league', 'غير معروف'),
+                )
+
+                if item['info'].get('last_watched_at'):
+                    item['info']['last_watched_at'] = item['info'].get('aired') or datetime.today().strftime(g.DATE_TIME_FORMAT)
+                if not item['info'].get('duration'):
+                    item['info']['duration'] = 6300
+                if not item['info'].get('genre'):
+                    item['info']['genre'] = ['sports']
+
+                item['info']['mediatype'] = g.MEDIA_MOVIE  # TODO: otherwise no red title for finished games
+
             if item['info'].get('title'):
                 item['info']['title'] = clean_up_string(item['info']['title'])
                 try:
@@ -107,6 +153,8 @@ class MetadataHandler:
             if not clearart: clearart = clearlogo
             item['art']['clearlogo'] = clearlogo
             item['art']['clearart'] = clearart
+
+        item['args'] = g.create_args(item)
 
     @staticmethod
     def improve_source(item):
