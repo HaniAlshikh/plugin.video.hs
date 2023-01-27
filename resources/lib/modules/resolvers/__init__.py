@@ -130,33 +130,30 @@ class Resolver:
             return
 
     def _handle_livestream_resolving(self, source, item_information):
-        stream_link = None
         g.log('Resolvinig live stream: ' + source['display_name'])
 
         if 'youtube' in source['url']:
             if '?v=' in source['url']:
-                stream_link = tools.youtube_url.format(source['url'].split("?v=")[-1])
+                return tools.youtube_url.format(source['url'].split("?v=")[-1])
             else:
-                stream_link = tools.youtube_url.format(source['url'].split("/")[-1])
+                return tools.youtube_url.format(source['url'].split("/")[-1])
 
-        elif 'vimeo' in source['url']:
+        if 'vimeo' in source['url']:
             # TODO
             return None
 
-        elif 'ragnarp' in source['url']:
+        if 'ragnarp' in source['url']:
             # TODO:
             return None
 
         # https://d1komd5x2s5yw0.cloudfro494d8ad3bb3308b6ff7e/index.m3u8
-        elif source["url"].endswith('m3u') or source["url"].endswith('m3u8'):
-            stream_link = source["url"]
+        if source["url"].endswith('m3u') or source["url"].endswith('m3u8'):
+            return source["url"]
 
         # https://livehd7.live/ch/bein9.html?stream_url=https://d1komd5x2s5yw0.cloudfront.net/out/v1/e187e3dex_3.m3u8&autoplay=false
-        elif 'stream_url' in source["url"]:
+        if 'stream_url' in source["url"]:
             import re
-            stream_link = re.search('.*stream_url=(.*).m3u.*', source["url"]).group(1) + '.m3u8'
-
-        return stream_link
+            return re.search('.*stream_url=(.*).m3u.*', source["url"]).group(1) + '.m3u8'
 
     def _resolve_hoster_or_cloud(self, source, item_information):
         stream_link = None

@@ -271,6 +271,7 @@ class GlobalVariables(object):
     MEDIA_SEASON = "season"
     MEDIA_EPISODE = "episode"
     MEDIA_CHANNEL = "channel"
+    MEDIA_SPORT = "sport"
 
     DATE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     DATE_TIME_FORMAT_ZULU = DATE_TIME_FORMAT + ".000Z"
@@ -1365,6 +1366,7 @@ class GlobalVariables(object):
             "{}: {}".format(g.ADDON_NAME, heading), [*options.keys()]
         )
         if option == -1:
+            self.log("user canceled option selection")
             return None
         return [*options.values()][option]
 

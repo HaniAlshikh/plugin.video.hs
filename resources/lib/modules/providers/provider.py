@@ -5,10 +5,8 @@ import os
 
 from bs4 import BeautifulSoup
 
-from resources.lib.database import Database
 from resources.lib.modules.globals import g
 from resources.lib.modules.metadata_handler import MetadataHandler
-from resources.lib.modules.providers.provider_utils import get_quality
 from resources.lib.modules.request import Request
 
 
@@ -51,7 +49,14 @@ class Provider:
                 url=(params.get('url') or self._none)(post_tag),
                 provider=self.name,
                 overview=(params.get('overview') or self._none)(post_tag),
-                last_watched_at=(params.get('last_watched_at') or self._none)(post_tag)
+                last_watched_at=(params.get('last_watched_at') or self._none)(post_tag),
+                first_team=(params.get('first_team') or self._none)(post_tag),
+                second_team=(params.get('second_team') or self._none)(post_tag),
+                aired=(params.get('aired') or self._none)(post_tag),
+                channel=(params.get('channel') or self._none)(post_tag),
+                result=(params.get('result') or self._none)(post_tag),
+                commentator=(params.get('commentator') or self._none)(post_tag),
+                league=(params.get('league') or self._none)(post_tag),
             )
 
             if params.get('edit_meta'):
@@ -128,6 +133,7 @@ class Provider:
             type=params.get('type'),
             provider=params.get('provider'),
             origin=self.name,
+            channel=params.get('channel'),
         )
 
     def _extract_m3u(self):
