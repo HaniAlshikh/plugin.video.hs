@@ -35,7 +35,7 @@ class Alostora(SportsProvider):
         page = self.requests.get().text
         return self._extract_posts_meta(
             page, g.MEDIA_SPORT,
-            lambda soup: soup.find('div', id="yestrday").div,
+            lambda soup: soup.find('div', id="today").div,
             first_team=lambda game_div: game_div.find('div', class_='AF_FTeam').find('div', class_='AF_TeamName').get_text(),
             second_team=lambda game_div: game_div.find('div', class_='AF_STeam').find('div', class_='AF_TeamName').get_text(),
             aired=construct_air_datetime,
