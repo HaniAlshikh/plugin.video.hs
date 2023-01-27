@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.hs" name="H-S Videos" version="0.1.6" provider-name="Hani Alshikh">
+<addon id="plugin.video.hs" name="H-S Videos" version="0.1.7" provider-name="Hani Alshikh">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" optional="false"/>
 		<import addon="script.module.requests" version="2.22.0" optional="false"/>
