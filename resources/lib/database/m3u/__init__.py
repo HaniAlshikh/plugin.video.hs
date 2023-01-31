@@ -162,8 +162,8 @@ schema = {
 
 
 class M3UDatabase(Database):
-    def __init__(self, provider):
-        super(M3UDatabase, self).__init__(g.ADDON_USERDATA_PATH + provider.name + ".db", schema)
+    def __init__(self, provider_name):
+        super(M3UDatabase, self).__init__(g.ADDON_USERDATA_PATH + provider_name + ".db", schema)
         self.metadataHandler = MetadataHandler()
         self.page_limit = g.get_int_setting("item.limit")
 

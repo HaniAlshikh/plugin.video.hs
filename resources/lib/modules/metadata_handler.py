@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
-
 from resources.lib.common.tools import clean_up_string, parse_datetime
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.provider_utils import get_info, get_quality

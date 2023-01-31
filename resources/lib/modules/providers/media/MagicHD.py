@@ -2,9 +2,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.common.exceptions import RunNotNeeded
+from resources.lib.database.m3u import M3UDatabase
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.media.media_provider import MediaProvider
-from resources.lib.database.m3u import M3UDatabase
 
 
 class MagicHD(MediaProvider):
@@ -15,7 +15,7 @@ class MagicHD(MediaProvider):
             [g.get_setting('general.magicHD')],
         )
         self.support_channels = True
-        self.db = M3UDatabase(self)
+        self.db = M3UDatabase(self.name)
 
     def get_movies_categories(self) -> list:
         return self._get_categories(g.CONTENT_GENRE)
@@ -93,6 +93,8 @@ class MagicHD(MediaProvider):
             g.log("Failed to sync {} db: {}".format(self.name, self.urls[0]), "warning")
             return
 
+        # TODO: abstract, refactor -> find a better way
+        self.db = M3UDatabase(self.name + "_tmp")
         self.db.re_build_database(silent=True)
         show_genre_id = show_id = season_id = episode_id = genre_id = movie_id = channel_group_id = channel_id = 1  # don't change to 0
         show_genres_dict = shows_dict = seasons_dict = genres_dict = channels_dict = {}
@@ -205,11 +207,16 @@ class MagicHD(MediaProvider):
                 # raise e
 
         g.log("Finished inserting")
+        self.db.set_up_to_date()
+        import os
+        db_file = g.ADDON_USERDATA_PATH + self.name + ".db"
+        os.rename(self.db._db_file, db_file)
+        os.rename(self.db._db_file+".md5", db_file+"md5")
+
         g.log("Creating PVR source...")
         parser.remove_by_extension('mp4')
         pvr_file = g.M3U_FILES_PATH+"/"+self.name+".m3u"
         parser.to_file(g.M3U_FILES_PATH+"/"+self.name+".m3u", format="m3u")
         g.log("PVR source saved to: {}".format(pvr_file))
 
-        self.db.set_up_to_date()
         self.progress_dialog.update(100, self.notification_header, 'تمت الزامنة')

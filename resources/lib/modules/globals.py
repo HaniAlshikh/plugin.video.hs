@@ -11,10 +11,11 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
-# from unidecode import unidecode
 
 from resources.lib.common import tools
 from resources.lib.modules.settings_cache import PersistedSettingsCache, RuntimeSettingsCache
+
+# from unidecode import unidecode
 
 viewTypes = [
     ("Default", 50),
@@ -315,6 +316,7 @@ class GlobalVariables(object):
         self.FROM_WIDGET = False
         self.PAGE = 1
         self.PROVIDERS = {}
+        self.DEBUG_MODE = False  # TODO: add it to settings
 
     def __del__(self):
         self.deinit()
@@ -832,10 +834,12 @@ class GlobalVariables(object):
     def log(self, msg, level="info"):
         msg = msg
         msg = "{} ({}): {}".format(self.ADDON_NAME.upper(), self.PLUGIN_HANDLE, msg)
-        if level == "error":
-            xbmc.log(msg, level=xbmc.LOGERROR)
-        elif level == "info":
+        if level == "info":
             xbmc.log(msg, level=xbmc.LOGINFO)
+        elif not g.DEBUG_MODE:
+            return
+        elif level == "error":
+            xbmc.log(msg, level=xbmc.LOGERROR)
         elif level == "warning":
             xbmc.log(msg, level=xbmc.LOGWARNING)
         else:
