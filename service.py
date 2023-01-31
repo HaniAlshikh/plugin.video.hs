@@ -8,7 +8,6 @@ from random import randint
 import xbmc
 
 from resources.lib.modules.globals import g
-
 from resources.lib.modules.plugin_monitor import PluginMonitor
 
 g.init_globals(sys.argv)
@@ -22,7 +21,7 @@ g.log("#############  SERVICE ENTERED KEEP ALIVE  #################")
 
 monitor = PluginMonitor()
 try:
-    g.wait_for_abort(30)  # Sleep for a half a minute to allow widget loads to complete.
+    g.wait_for_abort(60 * 30)  # Sleep to allow widget loads to complete.
     while not monitor.abortRequested():
         if not g.wait_for_abort(15):  # Sleep to make sure tokens refreshed during maintenance
             xbmc.executebuiltin(

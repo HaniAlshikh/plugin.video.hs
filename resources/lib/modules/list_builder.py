@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from resources.lib.modules.globals import g
-from resources.lib.modules.metadata_handler import MetadataHandler
-
 import datetime
 
 import xbmcplugin
 
 from resources.lib.common import tools
+from resources.lib.modules.globals import g
+from resources.lib.modules.metadata_handler import MetadataHandler
 
 
 class ListBuilder(object):
@@ -326,13 +325,15 @@ class ListBuilder(object):
 
     @staticmethod
     def _sort_sport_games(games):
-        sorted_games = []
-        finished_games = []
-        for game in games:
-            if game['info'].get('last_watched_at'):
-                finished_games.append(game)
-            else:
-                sorted_games.append(game)
-        sorted_games.extend(finished_games)
-
-        return sorted_games
+        return games
+        # TODO: seems to be reverse sorting
+        # sorted_games = []
+        # finished_games = []
+        # for game in games:
+        #     if game['info'].get('last_watched_at'):
+        #         finished_games.append(game)
+        #     else:
+        #         sorted_games.append(game)
+        # sorted_games.extend(finished_games)
+        #
+        # return sorted_games
